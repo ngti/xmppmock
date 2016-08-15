@@ -1,0 +1,6 @@
+{
+  "domain": "example.com",
+  "c2s.port": 443,
+  "c2s.tls.keyPath": "certs/key.pem",
+  "c2s.tls.certPath": "certs/cert.pem"
+}

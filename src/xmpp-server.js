@@ -5,14 +5,12 @@ var server = null
 
 const xml = require('ltx')
 
-const XmppServer = function (serverDomain, serverPort) {
-  this.serverDomain = serverDomain
-  this.serverPort = serverPort
+const XmppServer = function (serverOptions) {
   this.stanzaHandlers = [
       (stanza) => {console.log(`[R] ${stanza.root().toString()}`)}
   ]
 
-  this.server = new xmpp.C2SServer({port: this.serverPort, domain: this.serverDomain})
+  this.server = new xmpp.C2SServer(serverOptions)
 
   const self = this
 

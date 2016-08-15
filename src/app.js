@@ -7,15 +7,38 @@ const Xmpp = require('./xmpp')
 const XmppServer = require('./xmpp-server')
 const Database = require('./db')
 const bodyParser = require('body-parser')
+const path = require('path')
 
 const COMPONENT_PORT = process.env.COMPONENT_PORT ? process.env.COMPONENT_PORT : 6666
 const COMPONENT_PASS = process.env.COMPONENT_PASS ? process.env.COMPONENT_PASS : 'password'
 
 const SERVER_HOST = process.env.SERVER_HOST ? process.env.SERVER_HOST : 'localhost'
-const SERVER_PORT = process.env.SERVER_PORT ? process.env.SERVER_PORT : 5552
+const SERVER_PORT = process.env.SERVER_PORT ? process.env.SERVER_PORT : 5222
+
+const SERVER_HOST_SSL = process.env.SERVER_HOST_SSL ? process.env.SERVER_HOST_SSL : 'example.com'
+const SERVER_PORT_SSL = process.env.SERVER_PORT_SSL ? process.env.SERVER_PORT_SSL : 443
+
+const USE_SSL = process.env.SERVER_HOST_SSL ? true : false
 
 const xmpp = new Xmpp(COMPONENT_PORT, COMPONENT_PASS)
-const xmppServer = new XmppServer(SERVER_HOST, SERVER_PORT)
+
+const serverOptions = {
+  port: SERVER_PORT,
+  domain: SERVER_HOST,
+}
+
+const serverOptionsTls = {
+  port: SERVER_PORT_SSL,
+  domain: SERVER_HOST_SSL,
+  tls: {
+    direct: true,
+    keyPath: path.join('certs/' + SERVER_HOST_SSL + '.key'),
+    certPath: path.join('certs/' + SERVER_HOST_SSL + '.crt')
+  }
+}
+
+
+const xmppServer = USE_SSL ? new XmppServer(serverOptionsTls) : new XmppServer(serverOptions)
 
 class Eventer extends EventEmitter {}
 
