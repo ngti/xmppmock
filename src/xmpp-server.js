@@ -4,6 +4,7 @@ const xmpp = require('node-xmpp-server')
 var server = null
 
 const xml = require('ltx')
+var authConfig = {}
 
 const XmppServer = function (serverOptions) {
   this.stanzaHandlers = [
@@ -25,12 +26,14 @@ const XmppServer = function (serverOptions) {
 
     client.on('authenticate', function (opts, cb) {
       console.log('server:', opts.username, opts.password, 'AUTHENTICATING')
-      if (opts.password != '') {
-        console.log('server:', opts.username, 'AUTH OK')
-        cb(null, opts)
-      } else {
+
+      console.log("authconfig " + authConfig[opts.password])
+      if((authConfig[opts.password] == 'fail') || opts.password == '') {
         console.log('server:', opts.username, 'AUTH FAIL')
         cb(false)
+      } else {
+        console.log('server:', opts.username, 'AUTH OK')
+        cb(null, opts)
       }
     })
 
@@ -65,6 +68,18 @@ XmppServer.prototype.send = function (stanzaString) {
   }
   var stanza = xml.parse(stanzaString)
   this.server.client.send(stanza)
+}
+
+XmppServer.prototype.configAuth = function (config) {
+  authConfig[config.password] = config.auth
+}
+
+XmppServer.prototype.deleteAuthConfig = function () {
+  authConfig = {}
+}
+
+XmppServer.prototype.getAuthConfig = function () {
+  return authConfig
 }
 
 module.exports = XmppServer

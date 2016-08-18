@@ -123,6 +123,23 @@ app.delete('/v1/stanzas', (req, res) => {
   res.status(200).end()
 })
 
+// { 'password': 'invalidToken', 'auth': 'fail' }
+app.post('/v1/auth', (req, res) => {
+  console.log("Configuring auth: " + JSON.stringify(req.body))
+  xmppServer.configAuth(req.body)
+  res.status(200).end()
+})
+
+app.delete('/v1/auth', (req, res) => {
+  console.log("Deleting auth config")
+  xmppServer.deleteAuthConfig()
+  res.status(200).end()
+})
+
+app.get('/v1/auth', (req,res) => {
+    res.json(xmppServer.getAuthConfig()).end()
+})
+
 app.listen(3000, () => { console.log('XMPP Mock listening on port 3000!') })
 
 xmpp.start()
