@@ -8,7 +8,7 @@ var authConfig = {}
 
 const XmppServer = function (serverOptions) {
   this.stanzaHandlers = [
-      (stanza) => {console.log(`[R] ${stanza.root().toString()}`)}
+    (stanza) => { console.log(`[R] ${stanza.root().toString()}`) }
   ]
 
   this.server = new xmpp.C2SServer(serverOptions)
@@ -16,7 +16,6 @@ const XmppServer = function (serverOptions) {
   const self = this
 
   this.server.on('connection', function (client) {
-
     this.client = client
 
     client.on('register', function (opts, cb) {
@@ -27,8 +26,8 @@ const XmppServer = function (serverOptions) {
     client.on('authenticate', function (opts, cb) {
       console.log('server:', opts.username, opts.password, 'AUTHENTICATING')
 
-      console.log("authconfig " + authConfig[opts.password])
-      if((authConfig[opts.password] == 'fail') || opts.password == '') {
+      console.log('authconfig ' + authConfig[opts.password])
+      if ((authConfig[opts.password] == 'fail') || opts.password == '') {
         console.log('server:', opts.username, 'AUTH FAIL')
         cb(false)
       } else {
@@ -37,7 +36,7 @@ const XmppServer = function (serverOptions) {
       }
     })
 
-    client.on('online', ()=> console.log('server:', client.jid.local, 'ONLINE'))
+    client.on('online', () => console.log('server:', client.jid.local, 'ONLINE'))
 
     client.on('stanza', (stanza) => {
       for (const handler of self.stanzaHandlers) {
@@ -45,8 +44,7 @@ const XmppServer = function (serverOptions) {
       }
     })
 
-    client.on('disconnect', ()=> console.log('server:', client.jid, 'DISCONNECT'))
-
+    client.on('disconnect', () => console.log('server:', client.jid, 'DISCONNECT'))
   })
 }
 
@@ -56,13 +54,13 @@ XmppServer.prototype.addStanzaHandler = function (handler) {
 
 XmppServer.prototype.start = function (done) {
   const doneFunc = done || function () {
-      console.log('XmppServer initialization done, happy hacking')
-    }
+    console.log('XmppServer initialization done, happy hacking')
+  }
   this.server.on('listening', doneFunc)
 }
 
 XmppServer.prototype.send = function (stanzaString) {
-  console.log("stanzaString, ", stanzaString)
+  console.log('stanzaString, ', stanzaString)
   if (!this.server.client) {
     console.error('client is not connected')
   }

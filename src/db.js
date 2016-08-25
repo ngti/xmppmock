@@ -1,5 +1,6 @@
 'use strict'
 const Datastore = require('nedb')
+const xml = require('xml2js')
 
 class Database {
   constructor () {
@@ -7,7 +8,12 @@ class Database {
   }
 
   insert (stanza, callback) {
-    this.db.insert({xml: `${stanza}`}, callback)
+    var that = this
+    xml.parseString(stanza, function (err, result) {
+      var type = Database.getStanzaType(result)
+
+      that.db.insert({xml: `${stanza}`, type: type}, callback)
+    })
   }
 
   findAll (callback) {
@@ -15,7 +21,7 @@ class Database {
   }
 
   flush () {
-    this.db.remove({}, { multi: true }, (err, numRemoved) => {
+    this.db.remove({}, {multi: true}, (err, numRemoved) => {
       if (err) {
         console.error(`error flushing database: ${err}`)
       } else {
@@ -23,6 +29,15 @@ class Database {
       }
     })
   }
+
+  find (type, callback) {
+    this.db.find({'type': type}, callback)
+  }
+
+  static getStanzaType (jsonStanza) {
+    return Object.keys(jsonStanza)[0]
+  }
+
 }
 
 module.exports = Database

@@ -24,7 +24,7 @@ const xmpp = new Xmpp(COMPONENT_PORT, COMPONENT_PASS)
 
 const serverOptions = {
   port: SERVER_PORT,
-  domain: SERVER_HOST,
+  domain: SERVER_HOST
 }
 
 const serverOptionsTls = {
@@ -37,10 +37,10 @@ const serverOptionsTls = {
   }
 }
 
-
 const xmppServer = USE_SSL ? new XmppServer(serverOptionsTls) : new XmppServer(serverOptions)
 
-class Eventer extends EventEmitter {}
+class Eventer extends EventEmitter {
+}
 
 const emitter = new Eventer()
 
@@ -72,7 +72,7 @@ xmppServer.addStanzaHandler((stanza) => {
 })
 
 const app = express()
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({extended: false}))
 app.use(require('morgan')('dev'))
 app.use((err, req, res, next) => {
   console.error(err.stack)
@@ -80,7 +80,7 @@ app.use((err, req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-  res.json({ status: 'ok' }).end()
+  res.json({status: 'ok'}).end()
 })
 
 app.get('/v1/stanzas', (req, res) => {
@@ -93,6 +93,30 @@ app.get('/v1/stanzas', (req, res) => {
       res.json(docs).end()
     })
   }
+
+  if (dirty) {
+    findAndRespond()
+  } else {
+    ewait.waitForAll([emitter], (err) => {
+      if (err) {
+        console.log('Timeout waiting for stanzas')
+      }
+      findAndRespond()
+    }, 10000, 'inserted')
+  }
+})
+
+app.get('/v1/messages', (req, res) => {
+  function findAndRespond () {
+    db.find('message', (err, docs) => {
+      if (err) {
+        res.status(500).send(err).end()
+        return
+      }
+      res.json(docs).end()
+    })
+  }
+
   if (dirty) {
     findAndRespond()
   } else {
@@ -125,22 +149,24 @@ app.delete('/v1/stanzas', (req, res) => {
 
 // { 'password': 'invalidToken', 'auth': 'fail' }
 app.post('/v1/auth', (req, res) => {
-  console.log("Configuring auth: " + JSON.stringify(req.body))
+  console.log('Configuring auth: ' + JSON.stringify(req.body))
   xmppServer.configAuth(req.body)
   res.status(200).end()
 })
 
 app.delete('/v1/auth', (req, res) => {
-  console.log("Deleting auth config")
+  console.log('Deleting auth config')
   xmppServer.deleteAuthConfig()
   res.status(200).end()
 })
 
-app.get('/v1/auth', (req,res) => {
-    res.json(xmppServer.getAuthConfig()).end()
+app.get('/v1/auth', (req, res) => {
+  res.json(xmppServer.getAuthConfig()).end()
 })
 
-app.listen(3000, () => { console.log('XMPP Mock listening on port 3000!') })
+app.listen(3000, () => {
+  console.log('XMPP Mock listening on port 3000!')
+})
 
 xmpp.start()
 xmppServer.start()
