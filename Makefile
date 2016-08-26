@@ -10,5 +10,5 @@ runrepo:
 	docker run -it -p 6666:6666 -p 3000:3000 -p 5222:5222 -p 443:443 --rm --name xmppmock-1 reg.cp.ngti.nl/xmppmock
 
 push: docker-build
-	docker tag xmppmock reg.cp.ngti.nl/xmppmock:0.0.4
-	docker push reg.cp.ngti.nl/xmppmock:0.0.4
+	docker tag xmppmock reg.cp.ngti.nl/xmppmock:0.0.5
+	docker push reg.cp.ngti.nl/xmppmock:0.0.5
