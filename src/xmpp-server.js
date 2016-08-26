@@ -28,7 +28,7 @@ const XmppServer = function (serverOptions) {
     client.on('authenticate', function (opts, cb) {
       console.log('server:', opts.username, opts.password, 'AUTHENTICATING')
 
-      if (this.isPasswordDisallowed(opts.password)) {
+      if (self.isPasswordDisallowed(opts.password)) {
         console.log('server:', opts.username, 'AUTH FAIL')
         cb(false)
       } else {
