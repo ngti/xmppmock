@@ -18,7 +18,7 @@ const SERVER_PORT = process.env.SERVER_PORT ? process.env.SERVER_PORT : 5222
 const SERVER_HOST_SSL = process.env.SERVER_HOST_SSL ? process.env.SERVER_HOST_SSL : 'example.com'
 const SERVER_PORT_SSL = process.env.SERVER_PORT_SSL ? process.env.SERVER_PORT_SSL : 443
 
-const USE_SSL = process.env.SERVER_HOST_SSL ? true : false
+const USE_SSL = process.env.USE_SSL === 'true'
 
 const xmpp = new Xmpp(COMPONENT_PORT, COMPONENT_PASS)
 
@@ -36,6 +36,8 @@ const serverOptionsTls = {
     certPath: path.join('certs/' + SERVER_HOST_SSL + '.crt')
   }
 }
+
+console.log("Starting with SSL enabled=" + USE_SSL)
 
 const xmppServer = USE_SSL ? new XmppServer(serverOptionsTls) : new XmppServer(serverOptions)
 
