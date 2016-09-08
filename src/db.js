@@ -12,12 +12,12 @@ class Database {
     xml.parseString(stanza, function (err, result) {
       var type = Database.getStanzaType(result)
 
-      that.db.insert({xml: `${stanza}`, type: type}, callback)
+      that.db.insert({xml: `${stanza}`, type: type, ts: Date.now()}, callback)
     })
   }
 
   findAll (callback) {
-    this.db.find({}, callback)
+    this.db.find({}).sort({ts: 1}).exec(callback)
   }
 
   flush () {
@@ -31,7 +31,7 @@ class Database {
   }
 
   find (type, callback) {
-    this.db.find({'type': type}, callback)
+    this.db.find({'type': type}).sort({ts: 1}).exec(callback)
   }
 
   static getStanzaType (jsonStanza) {

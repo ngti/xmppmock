@@ -10,7 +10,7 @@ const presence = '<presence id="Th8U2-8" xmlns:stream="http://etherx.jabber.org/
 describe('the database', function () {
   const db = new Database()
 
-  afterEach(function() {
+  afterEach(function () {
     db.flush()
   });
 
@@ -58,5 +58,27 @@ describe('the database', function () {
       })
     })
   })
+
+  it('saves things ordered', (done)=> {
+        db.insert(iq, (err, newdoc)=> {
+          if (err) return done(err)
+
+          db.insert(presence, (err, newdoc)=> {
+            if (err) return done(err)
+
+            db.findAll((err, docs) => {
+              if (err) return done(err)
+
+              assert.equal(2, docs.length)
+              assert.equal(iq, docs[0].xml)
+              assert.equal("iq", docs[0].type)
+              assert.equal(presence, docs[1].xml)
+              assert.equal("presence", docs[1].type)
+              done()
+            })
+          })
+        })
+      }
+  )
 
 })
