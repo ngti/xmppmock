@@ -17,7 +17,7 @@ class Database {
   }
 
   findAll (callback) {
-    this.db.find({}).sort({ts: 1}).exec(callback)
+    this.db.find({}).sort({ts: -1}).exec(callback)
   }
 
   flush () {
@@ -31,7 +31,7 @@ class Database {
   }
 
   find (type, callback) {
-    this.db.find({'type': type}).sort({ts: 1}).exec(callback)
+    this.db.find({'type': type}).sort({ts: -1}).exec(callback)
   }
 
   static getStanzaType (jsonStanza) {
