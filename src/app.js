@@ -131,6 +131,52 @@ app.get('/v1/messages', (req, res) => {
   }
 })
 
+app.get('/v1/iq', (req, res) => {
+  function findAndRespond () {
+    db.find('iq', (err, docs) => {
+      if (err) {
+        res.status(500).send(err).end()
+        return
+      }
+      res.json(docs).end()
+    })
+  }
+
+  if (dirty) {
+    findAndRespond()
+  } else {
+    ewait.waitForAll([emitter], (err) => {
+      if (err) {
+        console.log('Timeout waiting for stanzas')
+      }
+      findAndRespond()
+    }, 10000, 'inserted')
+  }
+})
+
+app.get('/v1/presence', (req, res) => {
+  function findAndRespond () {
+    db.find('presence', (err, docs) => {
+      if (err) {
+        res.status(500).send(err).end()
+        return
+      }
+      res.json(docs).end()
+    })
+  }
+
+  if (dirty) {
+    findAndRespond()
+  } else {
+    ewait.waitForAll([emitter], (err) => {
+      if (err) {
+        console.log('Timeout waiting for stanzas')
+      }
+      findAndRespond()
+    }, 10000, 'inserted')
+  }
+})
+
 app.post('/v1/stanzas', (req, res) => {
   console.log(req.body)
   xmpp.send(req.body.stanza)
