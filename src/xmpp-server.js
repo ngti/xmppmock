@@ -1,7 +1,6 @@
 'use strict'
 
 const xmpp = require('node-xmpp-server')
-var server = null
 
 const xml = require('ltx')
 var authConfig = {}
@@ -55,8 +54,8 @@ XmppServer.prototype.addStanzaHandler = function (handler) {
 
 XmppServer.prototype.start = function (done) {
   const doneFunc = done || function () {
-        console.log('XmppServer initialization done, happy hacking')
-      }
+    console.log('XmppServer initialization done, happy hacking')
+  }
   this.server.on('listening', doneFunc)
 }
 
@@ -64,9 +63,10 @@ XmppServer.prototype.send = function (stanzaString) {
   console.log('stanzaString, ', stanzaString)
   if (!this.server.client) {
     console.error('client is not connected')
+  } else {
+    var stanza = xml.parse(stanzaString)
+    this.server.client.send(stanza)
   }
-  var stanza = xml.parse(stanzaString)
-  this.server.client.send(stanza)
 }
 
 XmppServer.prototype.configAuth = function (config) {
@@ -82,8 +82,8 @@ XmppServer.prototype.getAuthConfig = function () {
 }
 
 XmppServer.prototype.isPasswordDisallowed = function (password) {
-  console.log('authconfig for ' + password + " : " + authConfig[password])
-  return authConfig[password] == 'fail' || password == ''
+  console.log('authconfig for ' + password + ' : ' + authConfig[password])
+  return authConfig[password] === 'fail' || password === ''
 }
 
 module.exports = XmppServer

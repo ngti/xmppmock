@@ -47,8 +47,9 @@ Xmpp.prototype.start = function (done) {
 Xmpp.prototype.send = function (stanzaString) {
   if (!this.server.component) {
     console.error('component is not connected')
+  } else {
+    var stanza = xml.parse(stanzaString)
+    this.server.component.send(stanza)
   }
-  var stanza = xml.parse(stanzaString)
-  this.server.component.send(stanza)
 }
 module.exports = Xmpp

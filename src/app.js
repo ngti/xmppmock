@@ -8,6 +8,8 @@ const XmppServer = require('./xmpp-server')
 const Database = require('./db')
 const bodyParser = require('body-parser')
 const path = require('path')
+const xml = require('ltx')
+const isEqual = require('lodash.isequal')
 
 const COMPONENT_PORT = process.env.COMPONENT_PORT ? process.env.COMPONENT_PORT : 6666
 const COMPONENT_PASS = process.env.COMPONENT_PASS ? process.env.COMPONENT_PASS : 'password'
@@ -37,7 +39,7 @@ const serverOptionsTls = {
   }
 }
 
-console.log("Starting with SSL enabled=" + USE_SSL)
+console.log('Starting with SSL enabled=' + USE_SSL)
 
 const xmppServer = USE_SSL ? new XmppServer(serverOptionsTls) : new XmppServer(serverOptions)
 
@@ -50,6 +52,8 @@ const db = new Database()
 
 // Indicates if something received through XMPP
 var dirty = false
+
+var expectations = []
 
 xmpp.addStanzaHandler((stanza) => {
   db.insert(stanza, (err, newdoc) => {
@@ -71,6 +75,29 @@ xmppServer.addStanzaHandler((stanza) => {
     emitter.emit('inserted')
     dirty = true
   })
+  var found = false
+
+  var recv = JSON.stringify(stanza)
+  console.log(`received type: ${recv}`)
+
+  for (var i = 0; i < expectations.length; i++) {
+    var expectation = expectations[i]
+    var exp = JSON.stringify(expectation.expected)
+
+    console.log(`expected: ${exp}`)
+
+// / match objects excluding ID???
+    if (isEqual(expectation.expected, stanza)) {
+      console.log(`match found for ${stanza.name}`)
+
+        // copy id from request to result
+      xmppServer.send(expectations[i].result)
+      found = true
+    }
+  }
+  if (!found) {
+    console.log('match not found')
+  }
 })
 
 const app = express()
@@ -183,12 +210,6 @@ app.post('/v1/stanzas', (req, res) => {
   res.status(200).end()
 })
 
-app.post('/server/v1/stanzas', (req, res) => {
-  console.log(req.body)
-  xmppServer.send(req.body.stanza)
-  res.status(200).end()
-})
-
 app.delete('/v1/stanzas', (req, res) => {
   db.flush()
   dirty = false
@@ -210,6 +231,23 @@ app.delete('/v1/auth', (req, res) => {
 
 app.get('/v1/auth', (req, res) => {
   res.json(xmppServer.getAuthConfig()).end()
+})
+
+/*
+Takes an expected stanza and a result to be sent when that stanza is received.
+The stanza should match fully, excluding the stanza id. The stanza id from the actual
+received stanza will be replaced in the result.
+*/
+app.post('/v1/when/equals', (req, res) => {
+  console.log(req.body)
+  expectations.push({expected: xml.parse(req.body.expected), result: xml.parse(req.body.result)})
+  res.status(200).end()
+})
+
+app.post('/server/v1/stanzas', (req, res) => {
+  console.log(req.body)
+  xmppServer.send(req.body.stanza)
+  res.status(200).end()
 })
 
 app.listen(3000, () => {

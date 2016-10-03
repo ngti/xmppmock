@@ -4,12 +4,12 @@ const assert = require('assert')
 const Server = require('../src/xmpp-server')
 
 const serverOptions = {
-  port: "5333",
-  domain: "localhost"
+  port: '5333',
+  domain: 'localhost'
 }
 
-describe('the server', function(){
-  const server = new Server()
+describe('the server', function () {
+  const server = new Server(serverOptions)
   const password = 'invalid.token'
 
   it('any password is allowed by default', (done) => {

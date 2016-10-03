@@ -1,6 +1,5 @@
 'use strict'
 const Datastore = require('nedb')
-const xml = require('xml2js')
 
 class Database {
   constructor () {
@@ -8,12 +7,9 @@ class Database {
   }
 
   insert (stanza, callback) {
-    var that = this
-    xml.parseString(stanza, function (err, result) {
-      var type = Database.getStanzaType(result)
+    var type = stanza.name
 
-      that.db.insert({xml: `${stanza}`, type: type, ts: Date.now()}, callback)
-    })
+    this.db.insert({xml: `${stanza}`, type: type, ts: Date.now()}, callback)
   }
 
   findAll (callback) {
@@ -32,10 +28,6 @@ class Database {
 
   find (type, callback) {
     this.db.find({'type': type}).sort({ts: -1}).exec(callback)
-  }
-
-  static getStanzaType (jsonStanza) {
-    return Object.keys(jsonStanza)[0]
   }
 
 }
