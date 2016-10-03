@@ -9,7 +9,8 @@ const Database = require('./db')
 const bodyParser = require('body-parser')
 const path = require('path')
 const xml = require('ltx')
-const isEqual = require('lodash.isequal')
+
+const stanzaIdPlaceholder = 'STANZA_ID'
 
 const COMPONENT_PORT = process.env.COMPONENT_PORT ? process.env.COMPONENT_PORT : 6666
 const COMPONENT_PASS = process.env.COMPONENT_PASS ? process.env.COMPONENT_PASS : 'password'
@@ -77,21 +78,23 @@ xmppServer.addStanzaHandler((stanza) => {
   })
   var found = false
 
+  var receivedId = stanza.attrs.id
+  stanza.attrs.id = stanzaIdPlaceholder
   var recv = JSON.stringify(stanza)
-  console.log(`received type: ${recv}`)
 
+  // Find matching expectations, send results
   for (var i = 0; i < expectations.length; i++) {
     var expectation = expectations[i]
     var exp = JSON.stringify(expectation.expected)
 
-    console.log(`expected: ${exp}`)
+    if (exp === recv) {
+      // copy id from request to result
+      var result = expectations[i].result
+      result.attrs.id = receivedId
 
-// / match objects excluding ID???
-    if (isEqual(expectation.expected, stanza)) {
-      console.log(`match found for ${stanza.name}`)
+      console.log(`match found, sending result ${JSON.stringify(result)}`)
 
-        // copy id from request to result
-      xmppServer.send(expectations[i].result)
+      xmppServer.send(result)
       found = true
     }
   }
@@ -240,7 +243,13 @@ received stanza will be replaced in the result.
 */
 app.post('/v1/when/equals', (req, res) => {
   console.log(req.body)
-  expectations.push({expected: xml.parse(req.body.expected), result: xml.parse(req.body.result)})
+  var expected = xml.parse(req.body.expected)
+  var result = xml.parse(req.body.result)
+  // Replace stanza ids, if present, by a placeholder
+  expected.attrs.id = stanzaIdPlaceholder
+  result.attrs.id = stanzaIdPlaceholder
+
+  expectations.push({expected: expected, result: result})
   res.status(200).end()
 })
 
