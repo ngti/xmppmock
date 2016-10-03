@@ -60,10 +60,10 @@ XmppServer.prototype.start = function (done) {
 }
 
 XmppServer.prototype.send = function (stanzaString) {
-  console.log('stanzaString, ', stanzaString)
   if (!this.server.client) {
-    console.error('client is not connected')
+    console.error('client is not connected, cannot send!')
   } else {
+    console.log(`[S] ${stanzaString}`)
     var stanza = xml.parse(stanzaString)
     this.server.client.send(stanza)
   }

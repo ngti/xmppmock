@@ -76,8 +76,6 @@ xmppServer.addStanzaHandler((stanza) => {
     emitter.emit('inserted')
     dirty = true
   })
-  var found = false
-
   var receivedId = stanza.attrs.id
   stanza.attrs.id = stanzaIdPlaceholder
   var recv = JSON.stringify(stanza)
@@ -92,14 +90,10 @@ xmppServer.addStanzaHandler((stanza) => {
       var result = expectations[i].result
       result.attrs.id = receivedId
 
-      console.log(`match found, sending result ${JSON.stringify(result)}`)
+      console.log(`match found, sending result`)
 
       xmppServer.send(result)
-      found = true
     }
-  }
-  if (!found) {
-    console.log('match not found')
   }
 })
 
@@ -241,15 +235,24 @@ Takes an expected stanza and a result to be sent when that stanza is received.
 The stanza should match fully, excluding the stanza id. The stanza id from the actual
 received stanza will be replaced in the result.
 */
-app.post('/v1/when/equals', (req, res) => {
-  console.log(req.body)
+app.post('/v1/mock/when/equals', (req, res) => {
   var expected = xml.parse(req.body.expected)
   var result = xml.parse(req.body.result)
+  console.log(`Mocking xmpp stanza(ignoring stanza id):\n${expected}\nresult will be\n${result}\n`)
   // Replace stanza ids, if present, by a placeholder
   expected.attrs.id = stanzaIdPlaceholder
   result.attrs.id = stanzaIdPlaceholder
 
   expectations.push({expected: expected, result: result})
+  res.status(200).end()
+})
+
+/*
+Clear all expectations
+*/
+app.delete('/v1/mock', (req, res) => {
+  console.log('Clearing all expectations in mock')
+  expectations = []
   res.status(200).end()
 })
 
