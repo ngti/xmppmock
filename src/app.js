@@ -80,6 +80,8 @@ xmppServer.addStanzaHandler((stanza) => {
   stanza.attrs.id = stanzaIdPlaceholder
   var recv = JSON.stringify(stanza)
 
+  console.log(`received ${recv}`)
+
   // Find matching expectations, send results
   for (var i = 0; i < expectations.length; i++) {
     var expectation = expectations[i]
@@ -90,7 +92,7 @@ xmppServer.addStanzaHandler((stanza) => {
       var result = expectations[i].result
       result.attrs.id = receivedId
 
-      console.log(`match found, sending result`)
+      console.log(`match found, sending result ${JSON.stringify(result)}`)
 
       xmppServer.send(result)
     }
@@ -231,10 +233,10 @@ app.get('/v1/auth', (req, res) => {
 })
 
 /*
-Takes an expected stanza and a result to be sent when that stanza is received.
-The stanza should match fully, excluding the stanza id. The stanza id from the actual
-received stanza will be replaced in the result.
-*/
+ Takes an expected stanza and a result to be sent when that stanza is received.
+ The stanza should match fully, excluding the stanza id. The stanza id from the actual
+ received stanza will be replaced in the result.
+ */
 app.post('/v1/mock/when/equals', (req, res) => {
   var expected = xml.parse(req.body.expected)
   var result = xml.parse(req.body.result)
@@ -248,8 +250,8 @@ app.post('/v1/mock/when/equals', (req, res) => {
 })
 
 /*
-Clear all expectations
-*/
+ Clear all expectations
+ */
 app.delete('/v1/mock', (req, res) => {
   console.log('Clearing all expectations in mock')
   expectations = []

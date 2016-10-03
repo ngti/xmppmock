@@ -54,8 +54,8 @@ XmppServer.prototype.addStanzaHandler = function (handler) {
 
 XmppServer.prototype.start = function (done) {
   const doneFunc = done || function () {
-    console.log('XmppServer initialization done, happy hacking')
-  }
+        console.log('XmppServer initialization done, happy hacking')
+      }
   this.server.on('listening', doneFunc)
 }
 
@@ -63,8 +63,21 @@ XmppServer.prototype.send = function (stanzaString) {
   if (!this.server.client) {
     console.error('client is not connected, cannot send!')
   } else {
-    console.log(`[S] ${stanzaString}`)
     var stanza = xml.parse(stanzaString)
+
+    // add delay element
+    var d = new Date();
+    var date = d.toISOString();
+
+    if (stanza.name === 'iq') {
+      stanza.children[0].remove("delay")
+      stanza.children[0].c("delay", {xmlns: "urn:xmpp:delay", stamp: date})
+    } else if (stanza.name === 'message') {
+      stanza.remove("delay")
+      stanza.c("delay", {xmlns: "urn:xmpp:delay", stamp: date})
+    }
+
+    console.log(`[S] ${stanza}`)
     this.server.client.send(stanza)
   }
 }
