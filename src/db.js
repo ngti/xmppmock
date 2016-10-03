@@ -4,16 +4,17 @@ const Datastore = require('nedb')
 class Database {
   constructor () {
     this.db = new Datastore()
+    this.seq = 0
   }
 
   insert (stanza, callback) {
     var type = stanza.name
 
-    this.db.insert({xml: `${stanza}`, type: type, ts: Date.now()}, callback)
+    this.db.insert({xml: `${stanza}`, id: this.seq++, type: type, ts: new Date().valueOf()}, callback)
   }
 
   findAll (callback) {
-    this.db.find({}).sort({ts: -1}).exec(callback)
+    this.db.find({}).sort({id: -1}).exec(callback)
   }
 
   flush () {
@@ -27,7 +28,7 @@ class Database {
   }
 
   find (type, callback) {
-    this.db.find({'type': type}).sort({ts: -1}).exec(callback)
+    this.db.find({'type': type}).sort({id: -1}).exec(callback)
   }
 
 }
