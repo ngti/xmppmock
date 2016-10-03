@@ -3,7 +3,7 @@ docker-build:
 
 docker-run:
 	docker run -it -p 6666:6666 -p 3000:3000 -p 5222:5222 -p 443:443 --rm --name xmppmock-1 xmppmock
-npm
+
 run: docker-build docker-run
 
 runrepo:
