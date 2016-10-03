@@ -2,7 +2,7 @@
   "repository": "ngti/xmppmock",
   "private": true,
   "name": "xmppmock",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A simple XMPP endpoint for components and clients to connect to",
   "main": "src/app.js",
   "scripts": {
