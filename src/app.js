@@ -78,9 +78,8 @@ xmppServer.addStanzaHandler((stanza) => {
   })
   var receivedId = stanza.attrs.id
   stanza.attrs.id = stanzaIdPlaceholder
+  stanza.remove('thread')
   var recv = JSON.stringify(stanza)
-
-  console.log(`received ${recv}`)
 
   // Find matching expectations, send results
   for (var i = 0; i < expectations.length; i++) {
@@ -243,6 +242,7 @@ app.post('/v1/mock/when/equals', (req, res) => {
   console.log(`Mocking xmpp stanza(ignoring stanza id):\n${expected}\nresult will be\n${result}\n`)
   // Replace stanza ids, if present, by a placeholder
   expected.attrs.id = stanzaIdPlaceholder
+  expected.remove('thread')
   result.attrs.id = stanzaIdPlaceholder
 
   expectations.push({expected: expected, result: result})
