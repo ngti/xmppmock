@@ -24,6 +24,7 @@ const SERVER_PORT_SSL = process.env.SERVER_PORT_SSL ? process.env.SERVER_PORT_SS
 const USE_SSL = process.env.USE_SSL === 'true'
 
 const xmpp = new Xmpp(COMPONENT_PORT, COMPONENT_PASS)
+const stanzaMatcher = new StanzaMatcher()
 
 const serverOptions = {
   port: SERVER_PORT,
@@ -55,6 +56,7 @@ const db = new Database()
 var dirty = false
 
 var expectations = []
+var expectationsv2 = []
 
 xmpp.addStanzaHandler((stanza) => {
   db.insert(stanza, (err, newdoc) => {
@@ -95,6 +97,35 @@ xmppServer.addStanzaHandler((stanza) => {
 
       xmppServer.send(result)
     }
+  }
+
+  for (var i = 0; i < expectationsv2.length; i++) {
+    var matcher = expectationsv2[i].matches
+
+    if (stanzaMatcher.matching(matcher, stanza)) {
+      var replacements = stanzaMatcher.getReplacements(matcher, stanza)
+      // console.log(`match found, sending result ${JSON.stringify(result)}`)
+
+      // var result = expectations[i].result
+      // result.attrs.id = receivedId
+      var actions = expectationsv2[i].actions
+      var sendResults = actions.sendResults;
+      if(sendResults){
+        if(sendResults.mdnReceived === 'true') {
+          sendMdnReceived(stanza, replacements)
+        }
+        if(sendResults.mdnSent === 'true') {
+          sendMdnSent(stanza, replacements)
+        }
+        if(sendResults.stanzas){
+          sendStanzas(sendResults.stanzas, replacements)
+        }
+      }
+
+
+      // xmppServer.send(result)
+    }
+
   }
 })
 
@@ -250,11 +281,31 @@ app.post('/v1/mock/when/equals', (req, res) => {
 })
 
 /*
+ Takes an expected stanza and a result to be sent when that stanza is received.
+ The stanza should match fully, excluding the stanza id. The stanza id from the actual
+ received stanza will be replaced in the result.
+ */
+app.post('/v1/mock/when', (req, res) => {
+  if (!req.body.matches || !req.body.actions) {
+    res.status(400).end()
+    return
+  }
+  var matches = req.body.matches
+  var actions = req.body.actions
+
+  console.log(`Mocking xmpp stanza(ignoring stanza id):\n${match}\nresult will be\n${actions}\n`)
+
+  expectationsv2.push({matches: matches, actions: actions})
+  res.status(200).end()
+})
+
+/*
  Clear all expectations
  */
 app.delete('/v1/mock', (req, res) => {
   console.log('Clearing all expectations in mock')
   expectations = []
+  expectationsv2 = []
   res.status(200).end()
 })
 

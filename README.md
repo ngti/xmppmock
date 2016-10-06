@@ -60,3 +60,70 @@ Then you can download required modules using npm and start up node-js with this 
 npm install
 node .
 ```
+
+Mocking request/responses
+===========
+To mock some actions to be taken when a matching stanza is sent, a POST can be issued to /v1/mock/when. The request
+should issue 'application/x-www-form-urlencoded' as its Content-Type. This call takes two form fields:
+- 'matches' indicates properties the stanza should match.
+- 'actions' indicates the actions to take when a stanza is matched.
+
+Matching stanzas
+--------
+The 'matches' form field should contain a JSON object with the following properties. 
+
+All of the available properties are listed here.
+```json
+{
+  name: "iq"/"message",
+  attrs: {
+    from: "%%FROM_USER%%@domain.com/%%RESOURCE%%",
+    to: "user2@%%DOMAIN%%",
+    id: "id_123",    
+    type: "result" // REQUIRED
+    ts: "%%TIMESTAMP%%"
+  }
+  children: [
+    { 
+      name: "add", // REQUIRED 
+      attrs: {
+          xmlns: "ucid:groupchat"
+      }
+    },
+    {
+      name: "body", // REQUIRED
+      text: "This is the text of the chat message"
+    }
+  ]
+}
+```
+
+All strings starting and ending with a '%' in these matchers work as wildcards, so they will match anything.
+Their actual value is used later to make replacements in the results.
+ 
+Any placeholder can have any name as long as it is surrounded by the percentage signs, and it can be used anywhere 
+EXCEPT for children names.
+
+The matching strategy is non-strict by default, if the stanza has additional elements/attributes it will be matched.
+
+Setting actions
+-------
+When a stanza is matched, several actions can be set to be sent. The 'actions' form field should contain
+a JSON object with these supported actions:
+
+```
+{
+    sendResults: {
+        mdnReceived: 'true',
+        mdnSent: 'true',
+        iqResult: 'true',         
+        stanzas : [
+            "<iq type="result'></iq>",
+            "<message from='%%FROM_USER%% to='user2@hotmail.com' id='id_123'><receipt type='sent' id='%%STANZA_ID%%'></message>
+        ]
+    }
+    
+}
+```
+
+Any unknown placeholders will be replaced by an empty string.
