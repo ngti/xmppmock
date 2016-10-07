@@ -1,62 +1,61 @@
 "use strict";
 
+var jsdiff = require('diff');
+
 const re = /%%\w+%%/g
 
 const StanzaMatcher = function () {
 
 }
 
-String.prototype.matchAll = function(regexp) {
-  var matches = [];
-  this.replace(regexp, function() {
-    var arr = ([]).slice.call(arguments, 0);
-    var extras = arr.splice(-2);
-    arr.index = extras[0];
-    arr.input = extras[1];
-    matches.push(arr);
-  });
-  return matches.length ? matches : null
-}
+const compareAttributes = function (expectedAttrs, attrs, result) {
+  for (var i in expectedAttrs) {
+    var expectedValue = expectedAttrs[i]
+    var value = attrs[i]
 
-const compareAttributes = function (expectedAttrs, attrs) {
-  var match = true
-  for (var attr in expectedAttrs) {
-    var expectedValue = expectedAttrs[attr]
-    var value = attrs[attr]
+    if (!value) {
+      result.matches = false
+    } else {
 
-    var allPlaceholders = expectedValue.matchAll(re)
+      var diffChars = jsdiff.diffChars(expectedValue, value);
 
-    var find = escapeRegExp(expectedValue)
-    for(var i in allPlaceholders){
-      var placeholder = allPlaceholders[i][0]
-      find = find.replace(placeholder, '[\\w\\.]+')
+      console.log(diffChars)
+      for (var j = 0; j < diffChars.length; j++) {
+        var curDiff = diffChars[j];
+
+        var removed = curDiff.removed
+        var added = curDiff.added
+        var matchesRegexp = re.test(curDiff.value)
+
+        if (removed && matchesRegexp) {
+          console.log("found placeholder " + curDiff.value)
+          result.replacements[curDiff.value] = diffChars[+j + 1].value
+          j++
+        } else if (removed || added) {
+          result.matches = false
+          console.log(`attribute value not matching, expected ${expectedValue}, got ${value}`)
+          return result
+        }
+      }
+
     }
-    var regExp = new RegExp(find)
 
-    if(!regExp.test(value)){
-      console.log(`Expected ${expectedValue}, found ${value}`)
-      match =false
-    }
   }
-  return match
-}
-
-function escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  return result
 }
 
 // returns true if the matcher matches the stanza
 StanzaMatcher.prototype.matching = function (matcher, stanza) {
-  if (matcher.name && matcher.name !== stanza.name) {
-    return false
+  var result = {
+    matches: true,
+    replacements: {}
   }
-  return !(matcher.attrs && !compareAttributes(matcher.attrs, stanza.attrs))
-}
 
-// returns an object with wildcard replacements
-StanzaMatcher.prototype.getReplacements = function (matcher, stanza) {
-
-
+  if (matcher.name && matcher.name !== stanza.name) {
+    result.matches = false
+    return result
+  }
+  return compareAttributes(matcher.attrs, stanza.attrs, result)
 }
 
 

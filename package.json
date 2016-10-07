@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.0",
+    "diff": "^3.0.0",
     "ewait": "^0.2.1",
     "express": "^4.13.4",
     "ltx": "^2.2.0",
