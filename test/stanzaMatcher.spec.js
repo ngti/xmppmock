@@ -21,6 +21,48 @@ describe('the stanza matcher', function () {
     done()
   })
 
+  it('matches by children name', (done) => {
+    var matcher = {
+      name: 'message',
+      children: [
+        {name: "body"}
+      ]
+    }
+    assert(stanzaMatcher.matching(matcher, stanza).matches)
+
+    done()
+  })
+
+  it('matches by children text', (done) => {
+    var matcher = {
+      name: 'message',
+      children: [
+        {
+          name: "body",
+          text: "hello world"
+        }
+      ]
+    }
+    assert(stanzaMatcher.matching(matcher, stanza).matches)
+
+    done()
+  })
+
+  it('does not match on different child text', (done) => {
+    var matcher = {
+      name: 'message',
+      children: [
+        {
+          name: "body",
+          text: "hello there"
+        }
+      ]
+    }
+    assert(!stanzaMatcher.matching(matcher, stanza).matches)
+
+    done()
+  })
+
   it('does not match a different name', (done) => {
     var matcher = {
       name: 'iq'
@@ -119,5 +161,6 @@ describe('the stanza matcher', function () {
 
     done()
   })
+
 
 })

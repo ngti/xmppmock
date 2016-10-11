@@ -99,31 +99,64 @@ xmppServer.addStanzaHandler((stanza) => {
     }
   }
 
+  function makeid () {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < 5; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  }
+
+  function sendMdnReceived (stanza, replacements) {
+    var mdn = new xml.Element('message', {
+      id: makeid(),
+      from: stanza.to,
+      to: stanza.from
+    }).c("received", {id: stanza.id})
+    sendStanzas([mdn], replacements)
+  }
+
+  function sendMdnSent (stanza, replacements) {
+    // xmppServer.send(result)
+    var mdn = new xml.Element('message', {
+      id: makeid(),
+      from: stanza.to,
+      to: stanza.from
+    }).c("sent", {id: stanza.id})
+    sendStanzas([mdn], replacements)
+  }
+
+  function sendStanzas (stanzas, replacements) {
+    for (var i = 0; i < stanzas.length; i++) {
+      var stanza = stanzas[i];
+
+    }
+  }
+
   for (var i = 0; i < expectationsv2.length; i++) {
     var matcher = expectationsv2[i].matches
 
-    if (stanzaMatcher.matching(matcher, stanza)) {
-      var replacements = stanzaMatcher.getReplacements(matcher, stanza)
+    var match = stanzaMatcher.matching(matcher, stanza);
+    if (match.matches) {
       // console.log(`match found, sending result ${JSON.stringify(result)}`)
 
       // var result = expectations[i].result
       // result.attrs.id = receivedId
       var actions = expectationsv2[i].actions
       var sendResults = actions.sendResults;
-      if(sendResults){
-        if(sendResults.mdnReceived === 'true') {
-          sendMdnReceived(stanza, replacements)
+      if (sendResults) {
+        if (sendResults.mdnReceived === 'true') {
+          sendMdnReceived(stanza, match.replacements)
         }
-        if(sendResults.mdnSent === 'true') {
-          sendMdnSent(stanza, replacements)
+        if (sendResults.mdnSent === 'true') {
+          sendMdnSent(stanza, match.replacements)
         }
-        if(sendResults.stanzas){
-          sendStanzas(sendResults.stanzas, replacements)
+        if (sendResults.stanzas) {
+          sendStanzas(sendResults.stanzas, match.replacements)
         }
       }
-
-
-      // xmppServer.send(result)
     }
 
   }

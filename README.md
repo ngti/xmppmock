@@ -82,7 +82,7 @@ All of the available properties are listed here.
     id: "id_123",    
     type: "result" // REQUIRED
     ts: "%%TIMESTAMP%%"
-  }
+  },
   children: [
     { 
       name: "add", // REQUIRED 
