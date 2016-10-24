@@ -48,6 +48,21 @@ describe('the stanza matcher', function () {
     done()
   })
 
+  it('matches by children text with some placeholder', (done) => {
+    var matcher = {
+      name: 'message',
+      children: [
+        {
+          name: "body",
+          text: "hello %%USER%%"
+        }
+      ]
+    }
+    assert(stanzaMatcher.matching(matcher, stanza).matches)
+
+    done()
+  })
+
   it('does not match on different child text', (done) => {
     var matcher = {
       name: 'message',
