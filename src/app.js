@@ -81,6 +81,22 @@ xmppServer.addStanzaHandler((stanza) => {
   stanza.remove('thread')
   var recv = JSON.stringify(stanza)
 
+  var ping = false
+  for (var j in stanza.children) {
+    if (stanza.children[j].name === 'ping') {
+      ping = true
+    }
+  }
+  if (ping) {
+    var res = new xml.Element('iq', {
+      id: receivedId,
+      from: stanza.to,
+      to: stanza.from,
+      type: 'result'
+    })
+    xmppServer.send(res)
+  }
+
   // Find matching expectations, send results
   for (var i = 0; i < expectations.length; i++) {
     var expectation = expectations[i]
