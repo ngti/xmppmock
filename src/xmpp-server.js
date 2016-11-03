@@ -70,10 +70,10 @@ XmppServer.prototype.send = function (stanzaString) {
     var d = new Date()
     var date = d.toISOString()
 
-    if (stanza.name === 'iq') {
+    if (stanza.name === 'iq' && stanza.children[0]) {
       stanza.children[0].remove('delay')
       stanza.children[0].c('delay', {xmlns: 'urn:xmpp:delay', stamp: date})
-    } else if (stanza.name === 'message') {
+    } else if (stanza.name === 'message' || stanza.name === 'iq') {
       stanza.remove('delay')
       stanza.c('delay', {xmlns: 'urn:xmpp:delay', stamp: date})
     }
