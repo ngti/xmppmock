@@ -24,3 +24,10 @@ Connect to the mock and send a messsage
     Send presence
     Send a message to 'robot2@localhost/1' with body 'Проверка связи 2'
     Message to 'robot2@localhost/1' with body 'Проверка связи 2' was received
+
+Send a ping IQ should receive the ping result
+    Connect to XMPP ${server} on ${port}
+    Authenticate user ${username} on domain ${domain} on resource ${resource} using password ${password}
+    Send presence
+    Send a ping to 'robot2@localhost/1' with id 'abc123'
+    Verify 'result' IQ with id 'abc123' was received

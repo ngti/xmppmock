@@ -11,6 +11,7 @@ Library				XmppLibrary.py
 *** Keywords ***
 Common prepare service for tests
     Set Xmpp Host               ${mock}
+    Flush captured
 
 Connect to XMPP ${server} on ${port}
     Create client to domain     ${domain}
@@ -22,15 +23,29 @@ Authenticate user ${username} on domain ${domain} on resource ${resource} using 
 Send a message to '${to}' with body '${body}'
     Send message                ${to}   ${body}
 
-Message to '${to}' with body '${body}' was received
-    ${stanzas}=                 Capture sent stanzas
-    ${stanza1_dic}=             Get from list               ${stanzas}          0
-    ${stanza1_str}=             Get from dictionary         ${stanza1_dic}      xml
-    Verify message ${stanza1_str} to ${to} with body ${body}
+Send a ping to '${to}' with id '${id}'
+    Send iq                     get     ping    urn:xmpp:ping   ${to}           ${id}
 
-Verify message ${stanza1_str} to ${to jid} with body ${body}
+Message to '${to}' with body '${body}' was received
+    ${stanzas}=                     Capture sent stanzas
+    ${stanza1_dic}=                 Get from list               ${stanzas}      0
+    ${stanza1_str}=                 Get from dictionary         ${stanza1_dic}  xml
     ${stanza}=                      ParseXML                    ${stanza1_str}
     Should be equal                 ${stanza.tag}               message
-    Element attribute should be     ${stanza}                   to                  ${to jid}
+    Element attribute should be     ${stanza}                   to                  ${to}
     ${body elem}=                   Get element                 ${stanza}           body
     Element text should be          ${body elem}                ${body}
+
+Verify '${iqType}' IQ with id '${id}' was received
+    @{stanzas}=                     Capture sent stanzas
+
+    :FOR   ${stanza_dic}    IN          @{stanzas}
+    \   ${stanza_str}=                  Get from dictionary         ${stanza_dic}  xml
+    \   ${stanza}=                      ParseXML                    ${stanza_str}
+    \   ${iqMatch}=                     Evaluate                    '${stanza.tag}'=='iq'
+    \   ${stanzaId}=                    Get Element Attribute       ${stanza}   id
+    \   ${idMatch}=                     Evaluate                    '${stanzaId}'=='${id}'
+    \   ${stanzaType}=                  Get Element Attribute       ${stanza}   type
+    \   ${typeMatch}=                   Evaluate                    '${stanzaType}'=='${iqType}'
+    \   Pass Execution If               ${iqMatch} & ${idMatch}     Stanza found
+    Fail    Stanza not found!

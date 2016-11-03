@@ -65,3 +65,6 @@ class XmppLibrary(object):
 
     def send_message(self, to, body):
         self._client.send(Message(to,body))
+
+    def send_iq(self, type, elementName, namespace, to, id):
+        self._client.send(Protocol('iq', to, type, attrs={'id': id},payload=[Node(elementName, {'xmlns': namespace})]))
