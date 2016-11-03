@@ -62,3 +62,6 @@ class XmppLibrary(object):
 
     def send_presence(self):
         self._client.sendInitPresence()
+
+    def send_message(self, to, body):
+        self._client.send(Message(to,body))
