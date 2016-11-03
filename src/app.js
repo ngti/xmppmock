@@ -9,6 +9,7 @@ const Database = require('./db')
 const bodyParser = require('body-parser')
 const path = require('path')
 const xml = require('ltx')
+const StanzaMatcher = require('./stanzaMatcher')
 
 const stanzaIdPlaceholder = 'STANZA_ID'
 
