@@ -1,0 +1,6 @@
+{
+  "watch": [
+    "src/"
+  ],
+  "logging-enabled": true
+}

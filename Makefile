@@ -1,4 +1,4 @@
-.PHONY : build run docker-build docker-run stop integration venv
+.PHONY : build run docker-build docker-run stop integration venv dev-run
 
 VERSION=0.1.0
 REPO_VERSION=0.0.11
@@ -18,6 +18,9 @@ docker-run:
 
 run: docker-build docker-run
 
+dev-run:
+	hot-reload src/app.js
+
 runrepo:
 	docker run -it --rm -p 6666:6666 -p 3000:3000 -p 5222:5222 -p 443:443 --rm --name xmppmock-1 reg.cp.ngti.nl/xmppmock:$(REPO_VERSION)
 
@@ -30,7 +33,7 @@ push: docker-build
 
 integration: venv
 	. ./venv/bin/activate
-	venv/bin/python -m robot -d test --loglevel DEBUG \
+	venv/bin/python -m robot -d test/log --loglevel DEBUG \
 		-v DOCKER_HOST:${docker-host} \
 		-v MEMCACHED_HOST:${memcached_host} \
 		test/robot

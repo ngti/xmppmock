@@ -12,6 +12,12 @@ Library				XmppLibrary.py
 Common prepare service for tests
     Set Xmpp Host               ${mock}
     Flush captured
+    Flush expectations
+
+Connect to the mock and send presence
+    Connect to XMPP ${server} on ${port}
+    Authenticate user ${username} on domain ${domain} on resource ${resource} using password ${password}
+    Send presence
 
 Connect to XMPP ${server} on ${port}
     Create client to domain     ${domain}
@@ -22,6 +28,9 @@ Authenticate user ${username} on domain ${domain} on resource ${resource} using 
 
 Send a message to '${to}' with body '${body}'
     Send message                ${to}   ${body}
+
+Send a message to '${to}' with id '${id}' and body '${body}'
+    Send message                ${to}   ${body}     ${id}
 
 Send a ping to '${to}' with id '${id}'
     Send iq                     get     ping    urn:xmpp:ping   ${to}           ${id}
@@ -35,6 +44,11 @@ Message to '${to}' with body '${body}' was received
     Element attribute should be     ${stanza}                   to                  ${to}
     ${body elem}=                   Get element                 ${stanza}           body
     Element text should be          ${body elem}                ${body}
+
+Receipt ${receiptType} was received referring to '${id}'
+    @{stanzas}=     Capture sent stanzas
+    log     ${stanzas}      console=yes
+    Find receipt    ${stanzas}      ${receiptType}      ${id}
 
 Verify '${iqType}' IQ with id '${id}' was received
     @{stanzas}=                     Capture sent stanzas

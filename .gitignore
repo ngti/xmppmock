@@ -1,6 +1,6 @@
 venv/
 # Logs
-logs
+test/log
 *.log
 npm-debug.log*
 
