@@ -127,23 +127,15 @@ xmppServer.addStanzaHandler((stanza) => {
   }
 
   function sendMdnReceived (stanza, replacements) {
-    // var res = new xml.Element('iq', {
-    //   id: receivedId,
-    //   from: stanza.to,
-    //   to: stanza.from,
-    //   type: 'result'
-    // })
-    // xmppServer.send(res)
 
     var mdn = new xml.Element('message', {
       id: makeid(),
       from: stanza.to,
       to: stanza.from
     })
-    mdn.c("received", {id: stanza.id})
-    // sendStanzas([mdn], replacements)
-    xmppServer.send(mdn)
+    mdn.c("received", {id: receivedId})
 
+    sendStanzas([mdn], replacements)
   }
 
   function sendMdnSent (stanza, replacements) {
@@ -152,23 +144,38 @@ xmppServer.addStanzaHandler((stanza) => {
       id: makeid(),
       from: stanza.to,
       to: stanza.from
-    }).c("sent", {id: stanza.id})
+    })
+    mdn.c("sent", {id: receivedId})
     sendStanzas([mdn], replacements)
   }
 
   function sendStanzas (stanzas, replacements) {
     for (var i = 0; i < stanzas.length; i++) {
-      var stanza = stanzas[i]
-      var replaced = replace(stanza, replacements)
+      var stanza = xml.parse(stanzas[i])
+      replace(stanza, replacements)
       console.log(`sending ${stanza}`)
-      xmppServer.send(replaced)
+      xmppServer.send(stanza)
     }
   }
 
   function replace (stanza, replacements) {
     console.log(`replacements: ${JSON.stringify(replacements)}`)
-    for(var i =0; i<replacements.legth; i++){
-      var replacement = replacements[i]
+    console.log(`stanza: ${stanza}`)
+    console.log(`stanza.attrs: ${stanza.attrs}`)
+
+    for (var replacementKey in replacements) {
+
+      if (replacements.hasOwnProperty(replacementKey)) {
+        // iterate through stanza.attrs
+        console.log(`replace ${replacementKey}`)
+        for (var key in stanza.attrs) {
+          if (stanza.attrs.hasOwnProperty(key) && stanza.attrs[key] === replacementKey) {
+            console.log(`replacing ${replacementKey} with ${replacements[replacementKey]} in attribute ${key}`)
+            stanza.attrs[key] = replacements[replacementKey]
+          }
+        }
+      }
+
     }
   }
 
@@ -177,7 +184,7 @@ xmppServer.addStanzaHandler((stanza) => {
 
     var match = stanzaMatcher.matching(matcher, stanza);
     if (match.matches) {
-      // console.log(`match found, sending result ${JSON.stringify(result)}`)
+      console.log(`match found, replacements: ${JSON.stringify(match.replacements)}`)
 
       // var result = expectations[i].result
       // result.attrs.id = receivedId
@@ -188,7 +195,6 @@ xmppServer.addStanzaHandler((stanza) => {
       console.log(`configured results: ${JSON.stringify(sendResults)}`)
       if (sendResults) {
         if (sendResults.mdnReceived === 'true') {
-          console.log(`configured to send mdn`)
           sendMdnReceived(stanza, match.replacements)
         }
         if (sendResults.mdnSent === 'true') {

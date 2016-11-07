@@ -9,6 +9,7 @@ const StanzaMatcher = function () {
 }
 
 var compareText = function (expectedValue, value, result) {
+  console.log(`${expectedValue}, ${value}`)
   var diffChars = jsdiff.diffChars(expectedValue, value);
 
   for (var j = 0; j < diffChars.length; j++) {
@@ -30,6 +31,7 @@ var compareText = function (expectedValue, value, result) {
 };
 
 const compareAttributes = function (expectedAttrs, attrs, result) {
+  console.log(`expected ${JSON.stringify(expectedAttrs)}, attrs ${JSON.stringify(attrs)}`)
   for (var i in expectedAttrs) {
     var expectedValue = expectedAttrs[i]
     var value = attrs[i]
@@ -64,6 +66,7 @@ StanzaMatcher.prototype.compareChildren = function (expected, children, result) 
   if (!expected || expected.length == 0) {
     return result
   }
+
   function getChild (children, name) {
     for (var i in children) {
       if (children[i].name === name) {

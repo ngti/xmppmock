@@ -119,7 +119,7 @@ a JSON object with these supported actions:
         iqResult: 'true',         
         stanzas : [
             "<iq type="result'></iq>",
-            "<message from='%%FROM_USER%% to='user2@hotmail.com' id='id_123'><receipt type='sent' id='%%STANZA_ID%%'></message>
+            "<message from='%%FROM_USER%% to='user2@hotmail.com' id='id_123'><receipt type='sent' id='%%STANZA_ID%%'></message>"
         ]
     }
     
