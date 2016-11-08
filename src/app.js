@@ -202,14 +202,17 @@ xmppServer.addStanzaHandler((stanza) => {
       var sendResults = actions.sendResults;
       // console.log(`configured results: ${JSON.stringify(sendResults)}`)
       if (sendResults) {
-        if (sendResults.mdnSent === 'true') {
-          sendMdnSent(stanza, match.replacements)
-        }
-        if (sendResults.mdnReceived === 'true') {
-          sendMdnReceived(stanza, match.replacements)
-        }
-        if (sendResults.stanzas) {
-          sendStanzas(sendResults.stanzas, match.replacements)
+        for(var action in sendResults){
+          if(sendResults.hasOwnProperty(action)){
+            if (action === "mdnSent" && sendResults[action] === 'true') {
+              sendMdnSent(stanza, match.replacements)
+            } else if (action === "mdnReceived" && sendResults[action] === 'true') {
+              sendMdnReceived(stanza, match.replacements)
+            } else if (sendResults.stanzas) {
+              sendStanzas(sendResults.stanzas, match.replacements)
+            }
+          }
+
         }
       }
     }
