@@ -174,7 +174,7 @@ xmppServer.addStanzaHandler((stanza) => {
           }
         }
         // Replace in children, text
-        if(stanza.children) {
+        if (stanza.children) {
           for (var i = 0; i < stanza.children.length; i++) {
             var child = stanza.children[i]
             // console.log(`child ${child}`)
@@ -202,11 +202,11 @@ xmppServer.addStanzaHandler((stanza) => {
       var sendResults = actions.sendResults;
       // console.log(`configured results: ${JSON.stringify(sendResults)}`)
       if (sendResults) {
-        if (sendResults.mdnReceived === 'true') {
-          sendMdnReceived(stanza, match.replacements)
-        }
         if (sendResults.mdnSent === 'true') {
           sendMdnSent(stanza, match.replacements)
+        }
+        if (sendResults.mdnReceived === 'true') {
+          sendMdnReceived(stanza, match.replacements)
         }
         if (sendResults.stanzas) {
           sendStanzas(sendResults.stanzas, match.replacements)
