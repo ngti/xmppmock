@@ -2,23 +2,25 @@
 
 var jsdiff = require('diff');
 
-const re = /%%\w+%%/g
 
 const StanzaMatcher = function () {
 
 }
 
 var compareText = function (expectedValue, value, result) {
-  console.log(`${expectedValue}, ${value}`)
+  console.log(`Compare text '${expectedValue}', '${value}'`)
   var diffChars = jsdiff.diffChars(expectedValue, value);
 
   for (var j = 0; j < diffChars.length; j++) {
+    const re = /%%\w+%%/g
     var curDiff = diffChars[j];
 
     var removed = curDiff.removed
     var added = curDiff.added
+    console.log(`matching on ${curDiff.value}`)
     var matchesRegexp = re.test(curDiff.value)
 
+    console.log(`Removed: ${removed}, added: ${added}, matches: ${matchesRegexp}`)
     if (removed && matchesRegexp) {
       console.log(`Found placeholder ${curDiff.value}`)
       result.replacements[curDiff.value] = diffChars[+j + 1].value
@@ -28,7 +30,8 @@ var compareText = function (expectedValue, value, result) {
       console.log(`Attribute value not matching, expected ${expectedValue}, got ${value}`)
     }
   }
-};
+
+}
 
 const compareAttributes = function (expectedAttrs, attrs, result) {
   console.log(`expected ${JSON.stringify(expectedAttrs)}, attrs ${JSON.stringify(attrs)}`)
@@ -76,9 +79,9 @@ StanzaMatcher.prototype.compareChildren = function (expected, children, result) 
   }
 
   function getText (child) {
-    for(i in child.children){
+    for (i in child.children) {
       var curChild = child.children[i];
-      if(typeof curChild == "string"){
+      if (typeof curChild == "string") {
         return curChild
       }
     }

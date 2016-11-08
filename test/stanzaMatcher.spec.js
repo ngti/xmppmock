@@ -48,6 +48,22 @@ describe('the stanza matcher', function () {
     done()
   })
 
+  it('matches by children text with full match placeholder', (done) => {
+    var matcher = {
+      name: 'message',
+      children: [
+        {
+          name: "body",
+          text: "%%BODY%%"
+        }
+      ]
+    }
+    assert(stanzaMatcher.matching(matcher, stanza).matches)
+
+    done()
+  })
+
+
   it('matches by children text with some placeholder', (done) => {
     var matcher = {
       name: 'message',

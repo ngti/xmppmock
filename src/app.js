@@ -160,18 +160,30 @@ xmppServer.addStanzaHandler((stanza) => {
 
   function replace (stanza, replacements) {
     console.log(`replacements: ${JSON.stringify(replacements)}`)
-    console.log(`stanza: ${stanza}`)
-    console.log(`stanza.attrs: ${stanza.attrs}`)
+    console.log(`stanza: ${JSON.stringify(stanza)}`)
 
     for (var replacementKey in replacements) {
 
       if (replacements.hasOwnProperty(replacementKey)) {
         // iterate through stanza.attrs
         console.log(`replace ${replacementKey}`)
+        // Replace in attributes
         for (var key in stanza.attrs) {
           if (stanza.attrs.hasOwnProperty(key) && stanza.attrs[key] === replacementKey) {
             console.log(`replacing ${replacementKey} with ${replacements[replacementKey]} in attribute ${key}`)
             stanza.attrs[key] = replacements[replacementKey]
+          }
+        }
+        // Replace in children, text
+        if(stanza.children) {
+          for (var i = 0; i < stanza.children.length; i++) {
+            var child = stanza.children[i]
+            console.log(`child ${child}`)
+            if (typeof child == "string" && child == replacementKey) {
+              stanza.children[i] = replacements[replacementKey]
+            } else {
+              replace(child, replacements)
+            }
           }
         }
       }

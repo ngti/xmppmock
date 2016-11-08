@@ -80,7 +80,7 @@ All of the available properties are listed here.
     from: "%%FROM_USER%%@domain.com/%%RESOURCE%%",
     to: "user2@%%DOMAIN%%",
     id: "id_123",    
-    type: "result" // REQUIRED
+    type: "result",
     ts: "%%TIMESTAMP%%"
   },
   children: [
