@@ -133,7 +133,7 @@ xmppServer.addStanzaHandler((stanza) => {
       from: stanza.to,
       to: stanza.from
     })
-    mdn.c("received", {id: receivedId})
+    mdn.c("received", {id: receivedId, xmlns: "urn:xmpp:receipts"})
 
     sendStanzas([mdn], replacements)
   }
@@ -145,7 +145,7 @@ xmppServer.addStanzaHandler((stanza) => {
       from: stanza.to,
       to: stanza.from
     })
-    mdn.c("sent", {id: receivedId})
+    mdn.c("sent", {id: receivedId, xmlns: "urn:xmpp:receipts"})
     sendStanzas([mdn], replacements)
   }
 
