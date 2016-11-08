@@ -8,7 +8,7 @@ const StanzaMatcher = function () {
 }
 
 var compareText = function (expectedValue, value, result) {
-  console.log(`Compare text '${expectedValue}', '${value}'`)
+  // console.log(`Compare text '${expectedValue}', '${value}'`)
   var diffChars = jsdiff.diffChars(expectedValue, value);
 
   for (var j = 0; j < diffChars.length; j++) {
@@ -17,13 +17,13 @@ var compareText = function (expectedValue, value, result) {
 
     var removed = curDiff.removed
     var added = curDiff.added
-    console.log(`matching on ${curDiff.value}`)
+    // console.log(`matching on ${curDiff.value}`)
     var matchesRegexp = re.test(curDiff.value)
 
-    console.log(`Removed: ${removed}, added: ${added}, matches: ${matchesRegexp}`)
+    // console.log(`Removed: ${removed}, added: ${added}, matches: ${matchesRegexp}`)
     if (removed && matchesRegexp) {
-      console.log(`Found placeholder ${curDiff.value}`)
       result.replacements[curDiff.value] = diffChars[+j + 1].value
+      console.log(`Found placeholder ${curDiff.value} -> ${diffChars[+j + 1].value}`)
       j++
     } else if (removed || added) {
       result.matches = false
@@ -34,7 +34,7 @@ var compareText = function (expectedValue, value, result) {
 }
 
 const compareAttributes = function (expectedAttrs, attrs, result) {
-  console.log(`expected ${JSON.stringify(expectedAttrs)}, attrs ${JSON.stringify(attrs)}`)
+  // console.log(`expected ${JSON.stringify(expectedAttrs)}, attrs ${JSON.stringify(attrs)}`)
   for (var i in expectedAttrs) {
     var expectedValue = expectedAttrs[i]
     var value = attrs[i]
@@ -101,7 +101,7 @@ StanzaMatcher.prototype.compareChildren = function (expected, children, result) 
         var textChild = getText(child)
         compareText(expected[i].text, textChild, result);
         if (!result.matches) {
-          // result.matches = false
+          result.matches = false
           console.log(`Unexpected text ${textChild}`)
         }
       }

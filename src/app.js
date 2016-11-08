@@ -153,24 +153,23 @@ xmppServer.addStanzaHandler((stanza) => {
     for (var i = 0; i < stanzas.length; i++) {
       var stanza = xml.parse(stanzas[i])
       replace(stanza, replacements)
-      console.log(`sending ${stanza}`)
       xmppServer.send(stanza)
     }
   }
 
   function replace (stanza, replacements) {
     console.log(`replacements: ${JSON.stringify(replacements)}`)
-    console.log(`stanza: ${JSON.stringify(stanza)}`)
+    console.log(`stanza: ${stanza}`)
 
     for (var replacementKey in replacements) {
 
       if (replacements.hasOwnProperty(replacementKey)) {
         // iterate through stanza.attrs
-        console.log(`replace ${replacementKey}`)
+        // console.log(`replace ${replacementKey}`)
         // Replace in attributes
         for (var key in stanza.attrs) {
           if (stanza.attrs.hasOwnProperty(key) && stanza.attrs[key] === replacementKey) {
-            console.log(`replacing ${replacementKey} with ${replacements[replacementKey]} in attribute ${key}`)
+            // console.log(`replacing ${replacementKey} with ${replacements[replacementKey]} in attribute ${key}`)
             stanza.attrs[key] = replacements[replacementKey]
           }
         }
@@ -178,7 +177,7 @@ xmppServer.addStanzaHandler((stanza) => {
         if(stanza.children) {
           for (var i = 0; i < stanza.children.length; i++) {
             var child = stanza.children[i]
-            console.log(`child ${child}`)
+            // console.log(`child ${child}`)
             if (typeof child == "string" && child == replacementKey) {
               stanza.children[i] = replacements[replacementKey]
             } else {
@@ -198,13 +197,10 @@ xmppServer.addStanzaHandler((stanza) => {
     if (match.matches) {
       console.log(`match found, replacements: ${JSON.stringify(match.replacements)}`)
 
-      // var result = expectations[i].result
-      // result.attrs.id = receivedId
-
       var actions = expectationsv2[i].actions
-      console.log(`configured actions: ${JSON.stringify(actions)}`)
+      // console.log(`configured actions: ${JSON.stringify(actions)}`)
       var sendResults = actions.sendResults;
-      console.log(`configured results: ${JSON.stringify(sendResults)}`)
+      // console.log(`configured results: ${JSON.stringify(sendResults)}`)
       if (sendResults) {
         if (sendResults.mdnReceived === 'true') {
           sendMdnReceived(stanza, match.replacements)
@@ -362,7 +358,7 @@ app.get('/v1/auth', (req, res) => {
 app.post('/v1/mock/when/equals', (req, res) => {
   var expected = xml.parse(req.body.expected)
   var result = xml.parse(req.body.result)
-  console.log(`Mocking xmpp stanza(ignoring stanza id):\n${expected}\nresult will be\n${result}\n`)
+  console.log(`Mocking xmpp stanza(ignoring stanza id):\n${JSON.stringify(expected)}\nresult will be\n${JSON.stringify(result)}\n`)
   // Replace stanza ids, if present, by a placeholder
   expected.attrs.id = stanzaIdPlaceholder
   expected.remove('thread')
@@ -378,7 +374,6 @@ app.post('/v1/mock/when/equals', (req, res) => {
  received stanza will be replaced in the result.
  */
 app.post('/v1/mock/when', (req, res) => {
-  console.log(`Mocking xmpp stanza(ignoring stanza id):\n${JSON.stringify(req.body)}`)
   if (!req.body.matches || !req.body.actions) {
     res.status(400).end()
     console.log("bad request, doesn't contain matches and actions")
@@ -387,7 +382,7 @@ app.post('/v1/mock/when', (req, res) => {
   var matches = JSON.parse(req.body.matches)
   var actions = JSON.parse(req.body.actions)
 
-  console.log(`Mocking xmpp stanza(ignoring stanza id):\n${matches}\nresult will be:\n${actions}\n`)
+  console.log(`Mocking xmpp stanza(ignoring stanza id):\n${JSON.stringify(matches)}\nresult will be:\n${JSON.stringify(actions)}\n`)
 
   expectationsv2.push({matches: matches, actions: actions})
   res.status(200).end()

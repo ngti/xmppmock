@@ -98,7 +98,7 @@ All of the available properties are listed here.
 }
 ```
 
-All strings starting and ending with a '%' in these matchers work as wildcards, so they will match anything.
+All strings starting and ending with a '%%' in these matchers work as wildcards, so they will match anything.
 Their actual value is used later to make replacements in the results.
  
 Any placeholder can have any name as long as it is surrounded by the percentage signs, and it can be used anywhere 
@@ -127,3 +127,41 @@ a JSON object with these supported actions:
 ```
 
 Any unknown placeholders will be replaced by an empty string.
+
+
+Examples
+=========
+
+####Send a message back to the user, replacing 'from' and body from the original message:
+
+matches:
+```
+{"name": "message", "attrs": { "from": "%%FROM_USER%%"},"children": [{"name": "body", "text": "%%BODY%%"}]}
+```
+actions:
+```
+{"sendResults": {"stanzas":["<message from='other@hotmail.com' to='%%FROM_USER%%' id='id_123'><body>%%BODY%%</body></message>"]}}
+```
+
+####Send sent and received receipts for all messages
+
+matches:
+```
+{"name": "message", "attrs": { "from": "%%FROM_USER%%", "to": "%%TO_USER%%"}}
+```
+actions:
+```
+{"sendResults": {"mdnReceived": "true", "mdnSent": "true"}}
+```
+
+####Match IQ by 'to', child attribute, send result
+
+matches:
+```
+{"name": "iq","attrs": {"type": "get", "from": "%%FROM_USER%%", "to": "groupchat_name@io4t.devucid.ch"},"children": [{"name": "info", "attrs": {"xmlns": "ucid:groupchat" }}]}
+```
+
+actions:
+```
+{"sendResults": {"stanzas":["<iq from='other@hotmail.com' to='%%FROM_USER%%' id='%%ID%%' type='result'></iq>"]}}
+```
