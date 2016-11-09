@@ -5,9 +5,15 @@ const ewait = require('ewait')
 const bodyParser = require('body-parser')
 const xml = require('ltx')
 const xmppMock = require('./xmppMock')
+const EventEmitter = require('events')
+
+class Eventer extends EventEmitter {
+}
+
+const emitter = new Eventer()
 
 const app = express()
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(require('morgan')('dev'))
 app.use((err, req, res, next) => {
   console.error(err.stack)
@@ -15,7 +21,7 @@ app.use((err, req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-  res.json({status: 'ok'}).end()
+  res.json({ status: 'ok' }).end()
 })
 
 app.get('/v1/stanzas', (req, res) => {
@@ -32,7 +38,7 @@ app.get('/v1/stanzas', (req, res) => {
   if (xmppMock.isDirty()) {
     findAndRespond()
   } else {
-    ewait.waitForAll([emitter], (err) => {
+    ewait.waitForAll([ emitter ], (err) => {
       if (err) {
         console.log('Timeout waiting for stanzas')
       }
@@ -43,7 +49,6 @@ app.get('/v1/stanzas', (req, res) => {
 
 app.get('/v1/messages', (req, res) => {
   function findAndRespond () {
-
     xmppMock.getReceived('message', (err, docs) => {
       if (err) {
         res.status(500).send(err).end()
@@ -56,7 +61,7 @@ app.get('/v1/messages', (req, res) => {
   if (xmppMock.isDirty()) {
     findAndRespond()
   } else {
-    ewait.waitForAll([emitter], (err) => {
+    ewait.waitForAll([ emitter ], (err) => {
       if (err) {
         console.log('Timeout waiting for stanzas')
       }
@@ -76,10 +81,10 @@ app.get('/v1/iq', (req, res) => {
     })
   }
 
-  if (dirty) {
+  if (xmppMock.isDirty()) {
     findAndRespond()
   } else {
-    ewait.waitForAll([emitter], (err) => {
+    ewait.waitForAll([ emitter ], (err) => {
       if (err) {
         console.log('Timeout waiting for stanzas')
       }
@@ -99,10 +104,10 @@ app.get('/v1/presence', (req, res) => {
     })
   }
 
-  if (dirty) {
+  if (xmppMock.isDirty()) {
     findAndRespond()
   } else {
-    ewait.waitForAll([emitter], (err) => {
+    ewait.waitForAll([ emitter ], (err) => {
       if (err) {
         console.log('Timeout waiting for stanzas')
       }
@@ -195,5 +200,4 @@ app.listen(3000, () => {
   console.log('XMPP Mock listening on port 3000!')
 })
 
-
-xmppMock.start()
+xmppMock.start(emitter)
