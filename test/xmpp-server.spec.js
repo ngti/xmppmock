@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('assert')
-const Server = require('../src/xmpp-server')
+const Server = require('../src/xmppComponentServer')
 
 const serverOptions = {
   port: '5333',

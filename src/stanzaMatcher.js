@@ -2,23 +2,34 @@
 
 var jsdiff = require('diff');
 
+// returns true if the matcher matches the stanza
+function matching (matcher, stanza) {
+  var result = {
+    matches: true,
+    replacements: {}
+  }
 
-const StanzaMatcher = function () {
-
+  if (matcher.name && matcher.name !== stanza.name) {
+    result.matches = false
+    return result
+  }
+  result = compareAttributes(matcher.attrs, stanza.attrs, result)
+  return compareChildren(matcher.children, stanza.children, result)
 }
 
-var compareText = function (expectedValue, value, result) {
+
+function compareText (expectedValue, value, result) {
   // console.log(`Compare text '${expectedValue}', '${value}'`)
   var diffChars = jsdiff.diffChars(expectedValue, value);
 
   for (var j = 0; j < diffChars.length; j++) {
-    const re = /%%\w+%%/g
+    const placeholderRegex = /%%\w+%%/g
     var curDiff = diffChars[j];
 
     var removed = curDiff.removed
     var added = curDiff.added
     // console.log(`matching on ${curDiff.value}`)
-    var matchesRegexp = re.test(curDiff.value)
+    var matchesRegexp = placeholderRegex.test(curDiff.value)
 
     // console.log(`Removed: ${removed}, added: ${added}, matches: ${matchesRegexp}`)
     if (removed && matchesRegexp) {
@@ -33,7 +44,7 @@ var compareText = function (expectedValue, value, result) {
 
 }
 
-const compareAttributes = function (expectedAttrs, attrs, result) {
+function compareAttributes(expectedAttrs, attrs, result) {
   // console.log(`expected ${JSON.stringify(expectedAttrs)}, attrs ${JSON.stringify(attrs)}`)
   for (var i in expectedAttrs) {
     var expectedValue = expectedAttrs[i]
@@ -50,22 +61,7 @@ const compareAttributes = function (expectedAttrs, attrs, result) {
 }
 
 
-// returns true if the matcher matches the stanza
-StanzaMatcher.prototype.matching = function (matcher, stanza) {
-  var result = {
-    matches: true,
-    replacements: {}
-  }
-
-  if (matcher.name && matcher.name !== stanza.name) {
-    result.matches = false
-    return result
-  }
-  result = compareAttributes(matcher.attrs, stanza.attrs, result)
-  return this.compareChildren(matcher.children, stanza.children, result)
-}
-
-StanzaMatcher.prototype.compareChildren = function (expected, children, result) {
+function compareChildren (expected, children, result) {
   if (!expected || expected.length == 0) {
     return result
   }
@@ -106,11 +102,11 @@ StanzaMatcher.prototype.compareChildren = function (expected, children, result) 
         }
       }
       result = compareAttributes(expected.attrs, child.attrs, result)
-      result = this.compareChildren(expected.children, child.children, result)
+      result = compareChildren(expected.children, child.children, result)
     }
   }
   return result
 }
 
 
-module.exports = StanzaMatcher
+module.exports = {matching}

@@ -3,7 +3,7 @@
 const xmpp = require('node-xmpp-server')
 const xml = require('ltx')
 
-const Xmpp = function (componentPort, componentPass) {
+const XmppComponentServer = function (componentPort, componentPass) {
   this.componentPort = componentPort
   this.componentPass = componentPass
   this.stanzaHandlers = [
@@ -35,16 +35,16 @@ const Xmpp = function (componentPort, componentPass) {
   })
 }
 
-Xmpp.prototype.addStanzaHandler = function (handler) {
+XmppComponentServer.prototype.addStanzaHandler = function (handler) {
   this.stanzaHandlers.push(handler)
 }
 
-Xmpp.prototype.start = function (done) {
+XmppComponentServer.prototype.start = function (done) {
   const doneFunc = done || function () { console.log('initialization done, happy hacking') }
   this.server.on('listening', doneFunc)
 }
 
-Xmpp.prototype.send = function (stanzaString) {
+XmppComponentServer.prototype.send = function (stanzaString) {
   if (!this.server.component) {
     console.error('component is not connected')
   } else {
@@ -52,4 +52,4 @@ Xmpp.prototype.send = function (stanzaString) {
     this.server.component.send(stanza)
   }
 }
-module.exports = Xmpp
+module.exports = XmppComponentServer
