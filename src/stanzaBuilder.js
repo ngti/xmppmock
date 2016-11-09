@@ -1,6 +1,5 @@
 'use strict'
 const xml = require('ltx')
-const assert = require('assert')
 
 function makeid () {
   var text = ''
