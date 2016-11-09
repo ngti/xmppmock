@@ -6,8 +6,7 @@ const stanzaMatcher = require('../src/stanzaMatcher')
 const stanza = xml.parse('<message type="chat" from="some.user.001@test.domain/someresource" to="nagios.fitnesse700.2214@test.domain" id="nb0xq" xmlns:stream="http://etherx.jabber.org/streams"><body>hello world</body></message>')
 const stanza2 = xml.parse('<message type="chat" from="some.user.001@test.domain" to="nagios.fitnesse700.2214@test.domain" id="nb0xq" xmlns:stream="http://etherx.jabber.org/streams"><body>hello world</body></message>')
 const stanza3 = xml.parse('<message type="chat" from="groupchat.test.domain" to="nagios.fitnesse700.2214@test.domain" id="nb0xq" xmlns:stream="http://etherx.jabber.org/streams"><body>hello world</body></message>')
-// const iq = xml.parse('<iq id="WVQmI-10" type="get" xmlns:stream="http://etherx.jabber.org/streams" from="test100@io4t.devucid.ch/21672"><query xmlns="jabber:iq:private"><storage xmlns="storage:bookmarks"/></query></iq>')
-// const presence = xml.parse('<presence id="Th8U2-8" xmlns:stream="http://etherx.jabber.org/streams" from="test100@io4t.devucid.ch/21672"><status>Online</status><priority>1</priority></presence>')
+const iqSetGroupchatTitle = xml.parse('<iq type="set" to="groupchat.io4t.ch" id="1478621898.443142_981" xmlns:stream="http://etherx.jabber.org/streams" from="user1@io4t.ch/ios_75_8579"><create xmlns="ucid:groupchat"><title>Groupchat</title></create></iq>')
 
 describe('the stanza matcher', function () {
   it('matches by exact stanza name', (done) => {
@@ -23,7 +22,7 @@ describe('the stanza matcher', function () {
     var matcher = {
       name: 'message',
       children: [
-        {name: 'body'}
+        { name: 'body' }
       ]
     }
     assert(stanzaMatcher.matching(matcher, stanza).matches)
@@ -148,7 +147,7 @@ describe('the stanza matcher', function () {
     }
     var result = stanzaMatcher.matching(matcher, stanza3)
     assert(result.matches)
-    assert.equal(result.replacements['%%DOMAIN%%'], 'groupchat.test.domain')
+    assert.equal(result.replacements[ '%%DOMAIN%%' ], 'groupchat.test.domain')
     done()
   })
 
@@ -160,7 +159,7 @@ describe('the stanza matcher', function () {
     }
     var result = stanzaMatcher.matching(matcher, stanza)
     assert(result.matches)
-    assert.equal(result.replacements['%%RESOURCE%%'], 'someresource')
+    assert.equal(result.replacements[ '%%RESOURCE%%' ], 'someresource')
     done()
   })
 
@@ -172,7 +171,7 @@ describe('the stanza matcher', function () {
     }
     var result = stanzaMatcher.matching(matcher, stanza)
     assert(result.matches)
-    assert.equal(result.replacements['%%RESOURCE%%'], 'someresource')
+    assert.equal(result.replacements[ '%%RESOURCE%%' ], 'someresource')
     done()
   })
 
@@ -185,6 +184,21 @@ describe('the stanza matcher', function () {
     var result = stanzaMatcher.matching(matcher, stanza)
     assert(!result.matches)
 
+    done()
+  })
+
+  it('matches joris request', (done) => {
+    var matcher = {
+      'name': 'iq',
+      'attrs': {
+        'type': 'set',
+        'from': 'user1@io4t.ch/ios_75_%%RANDOM%%',
+        'to': 'groupchat.io4t.ch'
+      }
+    }
+
+    var result = stanzaMatcher.matching(matcher, iqSetGroupchatTitle)
+    assert(result.matches)
     done()
   })
 })
