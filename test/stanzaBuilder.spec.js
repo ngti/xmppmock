@@ -1,6 +1,7 @@
 'use strict'
 
 const assert = require('assert')
+const xml = require('ltx')
 
 const stanzaBuilder = require('../src/stanzaBuilder')
 
@@ -9,11 +10,11 @@ const stanza = '<iq from="groupchat.io4t.ch" to="user1@io4t.ch/ios_75_%%RANDOM%%
 
 describe('the stanza builder', function () {
   it('replaces the partial resource', (done) => {
-    stanzaBuilder.replace(stanza, replacements)
+    var parsedStanza = xml.parse(stanza)
+    stanzaBuilder.replace(parsedStanza, replacements)
 
-    console.log(JSON.stringify(stanza))
-
-    assert(stanza.to === 'user1@io4t.ch/ios_75_8579')
+    console.log('to:', parsedStanza.attrs.to)
+    assert(parsedStanza.attrs.to === 'user1@io4t.ch/ios_75_8579')
 
     done()
   })

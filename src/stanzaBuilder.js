@@ -1,5 +1,6 @@
 'use strict'
 const xml = require('ltx')
+const assert = require('assert')
 
 function makeid () {
   var text = ''
@@ -33,7 +34,6 @@ function buildMdnReceived (stanza, replacements) {
 }
 
 function buildMdnSent (stanza, replacements) {
-  // xmppC2sServer.send(result)
   var mdn = new xml.Element('message', {
     id: makeid(),
     from: stanza.to,
@@ -45,27 +45,26 @@ function buildMdnSent (stanza, replacements) {
 }
 
 function replace (stanza, replacements) {
+  // assert(typeof stanza !== 'string')
   console.log(`replacements: ${JSON.stringify(replacements)}`)
-  console.log(`stanza: ${stanza}`)
+  console.log(`replace input: ${stanza}`)
 
   for (var replacementKey in replacements) {
     if (replacements.hasOwnProperty(replacementKey)) {
       // iterate through stanza.attrs
-      // console.log(`replace ${replacementKey}`)
       // Replace in attributes
       for (var key in stanza.attrs) {
-        if (stanza.attrs.hasOwnProperty(key) && stanza.attrs[ key ] === replacementKey) {
-          // console.log(`replacing ${replacementKey} with ${replacements[replacementKey]} in attribute ${key}`)
-          stanza.attrs[ key ] = replacements[ replacementKey ]
+        if (stanza.attrs.hasOwnProperty(key)) {
+          var val = stanza.attrs[ key ]
+          stanza.attrs[key] = val.replace(replacementKey, replacements[ replacementKey ])
         }
       }
       // Replace in children, text
       if (stanza.children) {
         for (var i = 0; i < stanza.children.length; i++) {
           var child = stanza.children[ i ]
-          // console.log(`child ${child}`)
-          if (typeof child === 'string' && child === replacementKey) {
-            stanza.children[ i ] = replacements[ replacementKey ]
+          if (typeof child === 'string') {
+            stanza.children[ i ] = stanza.children[ i ].replace(replacementKey, replacements[ replacementKey ])
           } else {
             replace(child, replacements)
           }
