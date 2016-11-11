@@ -163,16 +163,16 @@ function matchExpectationsV2 (stanza) {
       console.log(`match found, replacements: ${JSON.stringify(match.replacements)}`)
 
       var actions = expectationsv2[ i ].actions
-      // console.log(`configured actions: ${JSON.stringify(actions)}`)
       var sendResults = actions.sendResults
-      // console.log(`configured results: ${JSON.stringify(sendResults)}`)
       if (sendResults) {
         for (var action in sendResults) {
           if (sendResults.hasOwnProperty(action)) {
+            console.log(`action to perform: ${JSON.stringify(action)}`)
+
             if (action === 'mdnSent' && sendResults[ action ] === 'true') {
-              sendStanzas(stanzaBuilder.buildMdnSent(stanza, match.replacements))
+              sendStanzas([stanzaBuilder.buildMdnSent(stanza)], match.replacements)
             } else if (action === 'mdnReceived' && sendResults[ action ] === 'true') {
-              sendStanzas(stanzaBuilder.buildMdnReceived(stanza, match.replacements))
+              sendStanzas([stanzaBuilder.buildMdnReceived(stanza)], match.replacements)
             } else if (sendResults.stanzas) {
               sendStanzas(sendResults.stanzas, match.replacements)
             }

@@ -21,7 +21,7 @@ function buildPing (stanza) {
   })
 }
 
-function buildMdnReceived (stanza, replacements) {
+function buildMdnReceived (stanza) {
   var mdn = new xml.Element('message', {
     id: makeid(),
     from: stanza.to,
@@ -29,10 +29,10 @@ function buildMdnReceived (stanza, replacements) {
   })
   mdn.c('received', { id: stanza.id, xmlns: 'urn:xmpp:receipts' })
 
-  return replace(mdn, replacements)
+  return mdn
 }
 
-function buildMdnSent (stanza, replacements) {
+function buildMdnSent (stanza) {
   var mdn = new xml.Element('message', {
     id: makeid(),
     from: stanza.to,
@@ -40,7 +40,7 @@ function buildMdnSent (stanza, replacements) {
   })
   mdn.c('sent', { id: stanza.id, xmlns: 'urn:xmpp:receipts' })
 
-  return replace(mdn, replacements)
+  return mdn
 }
 
 function replace (stanza, replacements) {
@@ -71,6 +71,7 @@ function replace (stanza, replacements) {
       }
     }
   }
+  console.log(`replace output: ${stanza}`)
 }
 
 module.exports = {
