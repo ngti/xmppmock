@@ -70,9 +70,11 @@ should issue 'application/x-www-form-urlencoded' as its Content-Type. This call 
 
 Matching stanzas
 --------
-The 'matches' form field should contain a JSON object with the following properties. 
+The 'matches' form field should contain a JSON object.
 
-All of the available properties are listed here.
+Here, the 'name' will match an XML tag name, 'attrs' indicate values for the tag attributes, and 'children' indicates the
+presence of children elements. Each child tag is matched by the same rules, and they can be nested in principle indefinitely.
+
 ```json
 {
   name: "iq"/"message",
@@ -85,30 +87,31 @@ All of the available properties are listed here.
   },
   children: [
     { 
-      name: "add", // REQUIRED 
+      name: "add", 
       attrs: {
           xmlns: "ucid:groupchat"
-      }
+      },
+      children: [
+        name: "test"
+      ]
     },
     {
-      name: "body", // REQUIRED
-      text: "This is the text of the chat message"
+      name: "body",
+      text: "Hello, %%NAME%%"
     }
   ]
 }
 ```
 
-All strings starting and ending with a '%%' in these matchers work as wildcards, so they will match anything.
-Their actual value is used later to make replacements in the results.
- 
-Any placeholder can have any name as long as it is surrounded by the percentage signs, and it can be used anywhere 
-EXCEPT for children names.
-
-The matching strategy is non-strict by default, if the stanza has additional elements/attributes it will be matched.
+* Placeholders work as wildcards, they will match any string in the received stanza. Their actual value can be used to make replacements in the results.
+* Placeholders are matched by the '%%\w+%%' regexp, which means a-z, A-Z, 0-9 and the underscore(_) can be used for placeholder names.
+* The match on tag name is exact, no placeholders are allowed.
+* If a placeholder matches two different values, the stanza will NOT match.
+* The matching strategy is non-strict by default, if the stanza has additional elements/attributes it WILL match.
 
 Setting actions
 -------
-When a stanza is matched, several actions can be set to be sent. The 'actions' form field should contain
+When a stanza is matched, several actions can be set. The 'actions' form field should contain
 a JSON object with these supported actions:
 
 ```
@@ -126,8 +129,7 @@ a JSON object with these supported actions:
 }
 ```
 
-Any unknown placeholders will be replaced by an empty string.
-
+- Any unknown placeholders will NOT be replaced.
 
 Examples
 =========

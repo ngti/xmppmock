@@ -64,14 +64,18 @@ function start (emitter) {
 
   xmppC2sServer.addStanzaHandler((stanza) => {
     addToDb(stanza, emitter)
-    // Remove 'thread' element automatically added by libs
-    stanza.remove('thread')
-
-    answerToPing(stanza)
-
-    matchExpectationsV2(stanza)
-    matchExpectationsV1(stanza)
+    receivedStanzaFromClient(stanza)
   })
+}
+
+function receivedStanzaFromClient (stanza) {
+  // Remove 'thread' element automatically added by libs
+  stanza.remove('thread')
+
+  answerToPing(stanza)
+
+  matchExpectationsV2(stanza)
+  matchExpectationsV1(stanza)
 }
 
 function addToDb (stanza, emitter) {
@@ -170,9 +174,9 @@ function matchExpectationsV2 (stanza) {
             console.log(`action to perform: ${JSON.stringify(action)}`)
 
             if (action === 'mdnSent' && sendResults[ action ] === 'true') {
-              sendStanzas([stanzaBuilder.buildMdnSent(stanza)], match.replacements)
+              sendStanzas([ stanzaBuilder.buildMdnSent(stanza) ], match.replacements)
             } else if (action === 'mdnReceived' && sendResults[ action ] === 'true') {
-              sendStanzas([stanzaBuilder.buildMdnReceived(stanza)], match.replacements)
+              sendStanzas([ stanzaBuilder.buildMdnReceived(stanza) ], match.replacements)
             } else if (sendResults.stanzas) {
               sendStanzas(sendResults.stanzas, match.replacements)
             }
@@ -260,5 +264,6 @@ module.exports = {
   getAuthConfig,
   getReceived,
   getAllReceived,
-  flushReceived
+  flushReceived,
+  receivedStanzaFromClient
 }
