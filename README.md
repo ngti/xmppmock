@@ -112,21 +112,38 @@ presence of children elements. Each child tag is matched by the same rules, and 
 Setting actions
 -------
 When a stanza is matched, several actions can be set. The 'actions' form field should contain
-a JSON object with these supported actions:
+a JSON array with these supported actions:
 
 ```
-{
-    sendResults: {
-        mdnReceived: 'true',
-        mdnSent: 'true',
-        iqResult: 'true',         
-        stanzas : [
-            "<iq type="result'></iq>",
-            "<message from='%%FROM_USER%% to='user2@hotmail.com' id='id_123'><receipt type='sent' id='%%STANZA_ID%%'></message>"
-        ]
+[
+    {
+        sendResults: [ "mdnReceived" ]
+    },
+    { 
+        sendStanzas: [ 
+            "<iq type='result'></iq>",
+            "<message from='%%FROM_USER%% to='user2@hotmail.com' id='id_123'><receipt type='sent' id='%%STANZA_ID%%'></message>" 
+            ]
+    },
+    { 
+        sendResults: [ "mdnSent" ]
     }
-    
-}
+]
+```
+
+The 'sendResults' fields can take 'mdnSent' and 'mdnReceived' values, and will send back a receipt of the given type, based
+on the incoming stanza.
+
+Many combinations can be used to set actions, the order by which the results are sent will match the order in the array:
+
+```
+[{"sendResults": ["mdnSent", "mdnReceived"]},{"sendStanzas": ["<message><body>testo</body></message>"]}]
+```
+```
+[{"sendResults": ["mdnSent", "mdnReceived"], "sendStanzas": ["<message><body>testo</body></message>"]}]
+```
+```
+[{"sendResults": ["mdnSent"], "sendStanzas": ["<message><body>testo</body></message>"]}, {"sendResults": [ "mdnReceived"]}]
 ```
 
 - Any unknown placeholders will NOT be replaced.

@@ -17,13 +17,23 @@ function matching (matcher, stanza) {
   return compareChildren(matcher.children, stanza.children, result)
 }
 
+/**
+ * Compare two text elements, sets 'matches=false' in  the result if the texts don't match,
+ * adds existing '%%\w+%%' placeholders with their values into 'result.replacements'.
+ * - Diffs the expected value against the actual one, should yield all 'added' diffs. If there's any 'removed' difference,
+ * then matches=false.
+ *
+ */
 function compareText (expectedValue, value, result) {
   console.log(`Compare text '${expectedValue}', '${value}'`)
+
+  // Compare trivial equality (full text match)
   if (expectedValue === value) {
     console.log('trivial equals')
     return
   }
 
+  // Find
   var placeholders = expectedValue.match(/%%\w+%%/g)
   if (!placeholders) {
     result.matches = false

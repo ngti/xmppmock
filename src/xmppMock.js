@@ -167,18 +167,26 @@ function matchExpectationsV2 (stanza) {
       console.log(`match found, replacements: ${JSON.stringify(match.replacements)}`)
 
       var actions = expectationsv2[ i ].actions
-      var sendResults = actions.sendResults
-      if (sendResults) {
-        for (var action in sendResults) {
-          if (sendResults.hasOwnProperty(action)) {
-            console.log(`action to perform: ${JSON.stringify(action)}`)
 
-            if (action === 'mdnSent' && sendResults[ action ] === 'true') {
-              sendStanzas([ stanzaBuilder.buildMdnSent(stanza) ], match.replacements)
-            } else if (action === 'mdnReceived' && sendResults[ action ] === 'true') {
-              sendStanzas([ stanzaBuilder.buildMdnReceived(stanza) ], match.replacements)
-            } else if (sendResults.stanzas) {
-              sendStanzas(sendResults.stanzas, match.replacements)
+      for (var action of actions) {
+        console.log(action)
+        for (var curActionType in action) {
+          console.log(curActionType)
+          if (action.hasOwnProperty(curActionType)) {
+            if (curActionType === 'sendResults') {
+              for (var r of action.sendResults) {
+                if (r === 'mdnSent') {
+                  sendStanzas([ stanzaBuilder.buildMdnSent(stanza) ], match.replacements)
+                } else if (r === 'mdnReceived') {
+                  sendStanzas([ stanzaBuilder.buildMdnReceived(stanza) ], match.replacements)
+                } else {
+                  console.log(`Unknown result set in actions ${r}`)
+                }
+              }
+            } else if (curActionType === 'sendStanzas') {
+              sendStanzas(action.sendStanzas, match.replacements)
+            } else {
+              console.log(`Unknown result set ${curActionType}`)
             }
           }
         }
