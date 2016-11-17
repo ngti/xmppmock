@@ -159,7 +159,7 @@ matches:
 ```
 actions:
 ```
-{"sendResults": {"stanzas":["<message from='other@hotmail.com' to='%%FROM_USER%%' id='id_123'><body>%%BODY%%</body></message>"]}}
+[{"sendStanzas":["<message from='other@hotmail.com' to='%%FROM_USER%%' id='id_123'><body>%%BODY%%</body></message>"]}]
 ```
 
 ####Send sent and received receipts for all messages
@@ -170,7 +170,7 @@ matches:
 ```
 actions:
 ```
-{"sendResults": {"mdnReceived": "true", "mdnSent": "true"}}
+[{"sendResults": ["mdnReceived", "mdnSent"]}]
 ```
 
 ####Match IQ by 'to', child attribute, send result
@@ -182,5 +182,5 @@ matches:
 
 actions:
 ```
-{"sendResults": {"stanzas":["<iq from='other@hotmail.com' to='%%FROM_USER%%' id='%%ID%%' type='result'></iq>"]}}
+[{"sendStanzas":["<iq from='other@hotmail.com' to='%%FROM_USER%%' id='%%ID%%' type='result'></iq>"]}]
 ```

@@ -4,6 +4,8 @@ var jsdiff = require('diff')
 
 // returns true if the matcher matches the stanza
 function matching (matcher, stanza) {
+  console.log(`Checking match on: ${JSON.stringify(matcher)}`)
+
   var result = {
     matches: true,
     replacements: {}
@@ -11,10 +13,13 @@ function matching (matcher, stanza) {
 
   if (matcher.name && matcher.name !== stanza.name) {
     result.matches = false
+    console.log(`Name not matching: ${stanza.name}, expected: ${matcher.name}`)
     return result
   }
   result = compareAttributes(matcher.attrs, stanza.attrs, result)
-  return compareChildren(matcher.children, stanza.children, result)
+  result = compareChildren(matcher.children, stanza.children, result)
+  console.log(`Matches: ${result.matches}`)
+  return result
 }
 
 /**
@@ -29,18 +34,19 @@ function compareText (expectedValue, value, result) {
 
   // Compare trivial equality (full text match)
   if (expectedValue === value) {
-    console.log('trivial equals')
+    console.log('Matches - Trivial equals')
     return
   }
 
-  // Find
+  // Find any placeholders
   var placeholders = expectedValue.match(/%%\w+%%/g)
   if (!placeholders) {
     result.matches = false
+    console.log(`Not matching, no placeholders found in ${value}`)
     return
   }
 
-  console.log(placeholders)
+  console.log(`Extracted placeholders: ${placeholders}`)
   var temp = expectedValue
   for (var i = 0; i < placeholders.length; i++) {
     var ph = placeholders[ i ]
@@ -48,23 +54,24 @@ function compareText (expectedValue, value, result) {
   }
 
   var diffChars = jsdiff.diffChars(temp, value)
-  console.log(`diff: ${JSON.stringify(diffChars)}`)
 
   var curPlaceholder = 0
   for (var j = 0; j < diffChars.length; j++) {
     var curDiff = diffChars[ j ]
     if (curDiff.removed) {
       result.matches = false
+      console.log(`Not matching, found extra string ${curDiff.value}`)
       return
     } else if (curDiff.added) {
       if (curPlaceholder >= placeholders.length) {
         result.matches = false
+        console.log(`Not matching, there are more differences than placeholders, expected ${placeholders.length}`)
         return
       }
       // is  there already an existing placeholder with a different value?
       var currentValue = result.replacements[ placeholders[ curPlaceholder ] ]
       if (currentValue && currentValue !== curDiff.value) {
-        console.log(`Existing placeholder ${placeholders[ curPlaceholder ]} -> ${currentValue} found again with a different value ${curDiff.value}`)
+        console.log(`Not matching, existing placeholder ${placeholders[ curPlaceholder ]} -> ${currentValue} found again with a different value ${curDiff.value}`)
         result.matches = false
         return
       }
@@ -74,18 +81,21 @@ function compareText (expectedValue, value, result) {
 }
 
 function compareAttributes (expectedAttrs, attrs, result) {
-  console.log(`
-        Comparing
-        attrs
-        expected: ${JSON.stringify(expectedAttrs)},
-        received: ${JSON.stringify(attrs)}`)
+  // console.log(`Comparing attrs
+  // expected:
+  //   ${JSON.stringify(expectedAttrs)}
+  // received:
+  //   ${JSON.stringify(attrs)}`)
+
   for (var i in expectedAttrs) {
     var expectedValue = expectedAttrs[ i ]
     var value = attrs[ i ]
 
     if (!value) {
+      console.log(`Not matching, attribute '${i}' not found`)
       result.matches = false
     } else {
+      console.log(`Compare attribute value of '${i}'`)
       compareText(expectedValue, value, result)
     }
   }
@@ -119,13 +129,7 @@ function compareChildren (expected, children, result) {
     var name = expected[ i ].name
     var child = getChild(children, name)
     if (!child) {
-      console.log(`
-        Did
-        not
-        find
-        an
-        element
-        with name ${name} in ${children}`)
+      console.log(`No match - Did not find an element with name ${name} in ${children}`)
       result.matches = false
       return result
     } else {
@@ -134,11 +138,14 @@ function compareChildren (expected, children, result) {
         compareText(expected[ i ].text, textChild, result)
         if (!result.matches) {
           result.matches = false
-          console.log(`Unexpected
-        text ${textChild}`)
+          console.log(`No match - Unexpected text ${textChild}`)
+          return result
         }
       }
       result = compareAttributes(expected[ i ].attrs, child.attrs, result)
+      if(!result.matches){
+        return
+      }
       result = compareChildren(expected.children, child.children, result)
     }
   }

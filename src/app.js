@@ -174,9 +174,6 @@ app.post('/v1/mock/when', (req, res) => {
   var matches = JSON.parse(req.body.matches)
   var actions = JSON.parse(req.body.actions)
 
-  console.log(actions)
-  console.log(Object.prototype.toString.call(actions))
-
   if (Object.prototype.toString.call(actions) !== '[object Array]') {
     res.status(400).send("'actions' is expected to be an array!").end()
     return

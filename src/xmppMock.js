@@ -151,7 +151,7 @@ function matchExpectationsV1 (stanza) {
       var result = expectations[ i ].result
       result.attrs.id = receivedId
 
-      console.log(`match found, sending result ${JSON.stringify(result)}`)
+      console.log(`Match found, sending result ${JSON.stringify(result)}`)
 
       xmppC2sServer.send(result)
     }
@@ -164,15 +164,15 @@ function matchExpectationsV2 (stanza) {
 
     var match = stanzaMatcher.matching(matcher, stanza)
     if (match.matches) {
-      console.log(`match found, replacements: ${JSON.stringify(match.replacements)}`)
+      console.log(`Match found, replacements: ${JSON.stringify(match.replacements)}`)
 
       var actions = expectationsv2[ i ].actions
 
       for (var action of actions) {
-        console.log(action)
         for (var curActionType in action) {
-          console.log(curActionType)
           if (action.hasOwnProperty(curActionType)) {
+            console.log(`Performing action: ${curActionType}`)
+
             if (curActionType === 'sendResults') {
               for (var r of action.sendResults) {
                 if (r === 'mdnSent') {
@@ -195,41 +195,12 @@ function matchExpectationsV2 (stanza) {
   }
 }
 
-function replace (stanza, replacements) {
-  console.log(`replacements: ${JSON.stringify(replacements)}`)
-  console.log(`stanza: ${stanza}`)
-
-  for (var replacementKey in replacements) {
-    if (replacements.hasOwnProperty(replacementKey)) {
-      // iterate through stanza.attrs
-      // console.log(`replace ${replacementKey}`)
-      // Replace in attributes
-      for (var key in stanza.attrs) {
-        if (stanza.attrs.hasOwnProperty(key) && stanza.attrs[ key ] === replacementKey) {
-          // console.log(`replacing ${replacementKey} with ${replacements[replacementKey]} in attribute ${key}`)
-          stanza.attrs[ key ] = replacements[ replacementKey ]
-        }
-      }
-      // Replace in children, text
-      if (stanza.children) {
-        for (var i = 0; i < stanza.children.length; i++) {
-          var child = stanza.children[ i ]
-          // console.log(`child ${child}`)
-          if (typeof child === 'string' && child === replacementKey) {
-            stanza.children[ i ] = replacements[ replacementKey ]
-          } else {
-            replace(child, replacements)
-          }
-        }
-      }
-    }
-  }
-}
-
 function sendStanzas (stanzas, replacements) {
   for (var i = 0; i < stanzas.length; i++) {
     var stanza = xml.parse(stanzas[ i ])
-    replace(stanza, replacements)
+    console.log(`Replace input: ${stanza}`)
+    stanzaBuilder.replace(stanza, replacements)
+    console.log(`Replace output: ${stanza}`)
     xmppC2sServer.send(stanza)
   }
 }

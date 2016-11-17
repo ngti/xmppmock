@@ -44,10 +44,6 @@ function buildMdnSent (stanza) {
 }
 
 function replace (stanza, replacements) {
-  // assert(typeof stanza !== 'string')
-  console.log(`replacements: ${JSON.stringify(replacements)}`)
-  console.log(`replace input: ${stanza}`)
-
   for (var replacementKey in replacements) {
     if (replacements.hasOwnProperty(replacementKey)) {
       // iterate through stanza.attrs
@@ -71,7 +67,6 @@ function replace (stanza, replacements) {
       }
     }
   }
-  console.log(`replace output: ${stanza}`)
 }
 
 module.exports = {
