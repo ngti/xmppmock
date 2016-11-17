@@ -143,8 +143,8 @@ function compareChildren (expected, children, result) {
         }
       }
       result = compareAttributes(expected[ i ].attrs, child.attrs, result)
-      if(!result.matches){
-        return
+      if (!result.matches) {
+        return result
       }
       result = compareChildren(expected.children, child.children, result)
     }
