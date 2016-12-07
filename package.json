@@ -17,9 +17,9 @@
     "diff": "^3.0.0",
     "ewait": "^0.2.1",
     "express": "^4.13.4",
+    "lokijs": "^1.4.1",
     "ltx": "^2.2.0",
     "morgan": "^1.6.1",
-    "nedb": "^1.7.2",
     "node-xmpp-server": "^2.1.3"
   },
   "standard": {

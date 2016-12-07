@@ -1,34 +1,33 @@
 'use strict'
-const Datastore = require('nedb')
+const Datastore = require('lokijs')
 
 class Database {
   constructor () {
     this.db = new Datastore()
+    this.coll = this.db.addCollection('stanzas')
+
     this.seq = 0
   }
 
   insert (stanza, callback) {
     var type = stanza.name
 
-    this.db.insert({xml: `${stanza}`, id: this.seq++, type: type, ts: new Date().valueOf()}, callback)
+    this.coll.insert({ xml: `${stanza}`, id: this.seq++, type: type, ts: new Date().valueOf() })
+    callback(null, stanza)
   }
 
   findAll (callback) {
-    this.db.find({}).sort({id: -1}).exec(callback)
+    var data = this.coll.chain().find({}).simplesort('id', true).data()
+    callback(null, data)
   }
 
   flush () {
-    this.db.remove({}, {multi: true}, (err, numRemoved) => {
-      if (err) {
-        console.error(`error flushing database: ${err}`)
-      } else {
-        console.log(`flushed ${numRemoved} stanzas from the db`)
-      }
-    })
+    this.coll.removeWhere({})
   }
 
   find (type, callback) {
-    this.db.find({'type': type}).sort({id: -1}).exec(callback)
+    var data = this.coll.chain().find({ 'type': type }).simplesort('id', true).data()
+    callback(null, data)
   }
 
 }
