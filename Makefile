@@ -1,7 +1,7 @@
 .PHONY : build run docker-build docker-run stop integration venv dev-run
 
 VERSION=0.1.5
-REPO_VERSION=0.0.11
+REPO_VERSION=0.1.5
 
 venv: venv/bin/activate
 
