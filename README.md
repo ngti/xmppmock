@@ -98,7 +98,7 @@ presence of children elements. Each child tag is matched by the same rules, and 
           xmlns: "ucid:groupchat"
       },
       children: [
-        name: "test"
+        { name: "test", absent: true}
       ]
     },
     {

@@ -126,23 +126,32 @@ function compareChildren (expected, children, result) {
   }
 
   for (var i in expected) {
-    var name = expected[ i ].name
+    let matcher = expected[ i ]
+
+    var name = matcher.name
     var child = getChild(children, name)
-    if (!child) {
+
+    if (matcher.absent && !child) {
+      // fine, go, on...
+    } else if (matcher.absent && child) {
+      console.log(`No match - Element with name ${name} should not be present in ${children}`)
+      result.matches = false
+      return result
+    } else if (!child) {
       console.log(`No match - Did not find an element with name ${name} in ${children}`)
       result.matches = false
       return result
-    } else {
-      if (expected[ i ].text) {
+    } else { // Expected to be present, match rest of attributes
+      if (matcher.text) {
         var textChild = getText(child)
-        compareText(expected[ i ].text, textChild, result)
+        compareText(matcher.text, textChild, result)
         if (!result.matches) {
           result.matches = false
           console.log(`No match - Unexpected text ${textChild}`)
           return result
         }
       }
-      result = compareAttributes(expected[ i ].attrs, child.attrs, result)
+      result = compareAttributes(matcher.attrs, child.attrs, result)
       if (!result.matches) {
         return result
       }
