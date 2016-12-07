@@ -100,5 +100,12 @@ XmppServer.prototype.isPasswordDisallowed = function (password) {
   return authConfig[password] === 'fail' || password === ''
 }
 
-module.exports = XmppServer
+XmppServer.prototype.disconnect = function () {
+  this.server.endSessions()
+}
 
+XmppServer.prototype.stop = function () {
+  this.server.end()
+}
+
+module.exports = XmppServer

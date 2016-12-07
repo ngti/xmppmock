@@ -52,4 +52,13 @@ XmppComponentServer.prototype.send = function (stanzaString) {
     this.server.component.send(stanza)
   }
 }
+
+XmppComponentServer.prototype.disconnect = function () {
+  this.server.endSessions()
+}
+
+XmppComponentServer.prototype.stop = function () {
+  this.server.end()
+}
+
 module.exports = XmppComponentServer

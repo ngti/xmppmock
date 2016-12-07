@@ -40,8 +40,8 @@ const stanzaIdPlaceholder = 'STANZA_ID'
 
 console.log('Starting C2S server with options=' + JSON.stringify(activeOptions))
 
-const xmppC2sServer = USE_SSL ? new XmppC2SServer(serverOptionsTls) : new XmppC2SServer(serverOptions)
-const xmppComponentServer = new XmppComponentServer(COMPONENT_PORT, COMPONENT_PASS)
+var xmppC2sServer
+var xmppComponentServer
 
 const db = new Database()
 
@@ -55,8 +55,12 @@ var expectationsv2 = []
  * Exports
  */
 function start (emitter) {
+  xmppC2sServer = USE_SSL ? new XmppC2SServer(serverOptionsTls) : new XmppC2SServer(serverOptions)
+  xmppComponentServer = new XmppComponentServer(COMPONENT_PORT, COMPONENT_PASS)
+
   xmppC2sServer.start()
   xmppComponentServer.start()
+
 
   xmppComponentServer.addStanzaHandler((stanza) => {
     addToDb(stanza, emitter)
@@ -229,6 +233,16 @@ function flushReceived () {
   db.flush()
 }
 
+function killConnections () {
+  xmppC2sServer.disconnect()
+  xmppComponentServer.disconnect()
+}
+
+function stop () {
+  xmppC2sServer.stop()
+  xmppComponentServer.stop()
+}
+
 module.exports = {
   start,
   clearExpectations,
@@ -244,5 +258,7 @@ module.exports = {
   getReceived,
   getAllReceived,
   flushReceived,
-  receivedStanzaFromClient
+  receivedStanzaFromClient,
+  killConnections,
+  stop
 }

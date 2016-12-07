@@ -201,6 +201,24 @@ app.post('/server/v1/stanzas', (req, res) => {
   res.status(200).end()
 })
 
+app.post('/v1/disconnect', (req, res) => {
+  console.log('Disconnect')
+  xmppMock.killConnections()
+  res.status(200).end()
+})
+
+app.post('/v1/stop', (req, res) => {
+  console.log('Stopping...')
+  xmppMock.stop()
+  res.status(200).end()
+})
+
+app.post('/v1/start', (req, res) => {
+  console.log('Starting...')
+  xmppMock.start(emitter)
+  res.status(200).end()
+})
+
 app.listen(3000, () => {
   console.log('XMPP Mock listening on port 3000!')
 })
