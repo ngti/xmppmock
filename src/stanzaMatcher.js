@@ -18,7 +18,6 @@ function matching (matcher, stanza) {
   }
   result = compareAttributes(matcher.attrs, stanza.attrs, result)
   result = compareChildren(matcher.children, stanza.children, result)
-  console.log(`Matches: ${result.matches}`)
   return result
 }
 
@@ -42,7 +41,7 @@ function compareText (expectedValue, value, result) {
   var placeholders = expectedValue.match(/%%\w+%%/g)
   if (!placeholders) {
     result.matches = false
-    console.log(`Not matching, no placeholders found in ${value}`)
+    console.log(`Not matching, value doesn't match and no placeholders found in ${value}`)
     return
   }
 
@@ -95,34 +94,34 @@ function compareAttributes (expectedAttrs, attrs, result) {
       console.log(`Not matching, attribute '${i}' not found`)
       result.matches = false
     } else {
-      console.log(`Compare attribute value of '${i}'`)
+      // console.log(`Compare attribute value of '${i}'`)
       compareText(expectedValue, value, result)
     }
   }
   return result
 }
 
+function getChild (children, name) {
+  for (var i in children) {
+    if (children[ i ].name === name) {
+      return children[ i ]
+    }
+  }
+}
+
+function getText (child) {
+  for (var i in child.children) {
+    var curChild = child.children[ i ]
+    if (typeof curChild === 'string') {
+      return curChild
+    }
+  }
+  return undefined
+}
+
 function compareChildren (expected, children, result) {
   if (!expected || expected.length === 0) {
     return result
-  }
-
-  function getChild (children, name) {
-    for (var i in children) {
-      if (children[ i ].name === name) {
-        return children[ i ]
-      }
-    }
-  }
-
-  function getText (child) {
-    for (i in child.children) {
-      var curChild = child.children[ i ]
-      if (typeof curChild === 'string') {
-        return curChild
-      }
-    }
-    return undefined
   }
 
   for (var i in expected) {
@@ -153,9 +152,10 @@ function compareChildren (expected, children, result) {
       }
       result = compareAttributes(matcher.attrs, child.attrs, result)
       if (!result.matches) {
+        // console.log("Attributes don't match")
         return result
       }
-      result = compareChildren(expected.children, child.children, result)
+      result = compareChildren(matcher.children, child.children, result)
     }
   }
   return result

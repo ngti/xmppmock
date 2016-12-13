@@ -9,6 +9,11 @@ const stanza3 = xml.parse('<message type="chat" from="groupchat.test.domain" to=
 const iqSetGroupchatTitle = xml.parse('<iq type="set" to="groupchat.io4t.ch" id="1478621898.443142_981" xmlns:stream="http://etherx.jabber.org/streams" from="user1@io4t.ch/ios_75_8579"><create xmlns="ucid:groupchat"><title>Groupchat</title></create></iq>')
 const osoIq = xml.parse('<iq to="groupchat.io4t.ch" from="user1@io4t.ch/76" id="150In-10" type="set" xmlns:stream="http://etherx.jabber.org/streams"><create xmlns="ucid:groupchat"><title>Hello World!</title></create></iq>')
 
+const deepMatcher =
+  JSON.parse('{"name":"iq","attrs":{"type":"set","from":"%%FROM_USER%%","id":"%%ID%%","to":"groupchat.io4t.ch"},"children":[{"name":"query","attrs":{"xmlns":"jabber:iq:search"},"children":[{"name":"x","attrs":{"xmlns":"jabber:x:data"},"children":[{"name":"field","attrs":{"var":"FORM_TYPE","type":"hidden"}},{"name":"field","attrs":{"var":"public","type":"boolean"}},{"name":"field","attrs":{"var":"participant","type":"boolean"}}]},{"name":"set","attrs":{"xmlns":"http://jabber.org/protocol/rsm"},"children":[{"name":"max","text":"2"},{"name":"after","absent":true}]}]}]}')
+const deepMatchStanzaFalse =
+  xml.parse('<iq to="groupchat.io4t.ch" from="user1@io4t.ch/76" id="rlgn0-10" type="set" xmlns:stream="http://etherx.jabber.org/streams"><query xmlns="jabber:iq:search"><x xmlns="jabber:x:data" type="submit"><field var="FORM_TYPE" type="hidden"><value>jabber:iq:search</value></field><field var="public" type="boolean"><value>1</value></field><field var="participant" type="boolean"><value>0</value></field></x><set xmlns="http://jabber.org/protocol/rsm"><max>2</max></set></query></iq>')
+
 describe('the stanza matcher', function () {
   it('matches by exact stanza name', (done) => {
     var matcher = {
@@ -283,6 +288,11 @@ describe('the stanza matcher', function () {
   it('does not match on additional string after the placeholder', (done) => {
     var result = { matches: true, replacements: {} }
     stanzaMatcher.compareText('user1@io4t.ch/%%RESOURCE%%abc', 'user1@io4t.ch/ios_75_8579', result)
+    assert(!result.matches)
+    done()
+  })
+  it('does not match a value deep in the matcher', (done) => {
+    var result = stanzaMatcher.matching(deepMatcher, deepMatchStanzaFalse)
     assert(!result.matches)
     done()
   })
