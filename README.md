@@ -1,6 +1,6 @@
 XMPP Mock
 =========
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Build Status](https://travis-ci.org/jsantiagoh/xmppmock.svg?branch=master)](https://travis-ci.org/jsantiagoh/xmppmock) [![Code Climate](https://codeclimate.com/github/jsantiagoh/xmppmock/badges/gpa.svg)](https://codeclimate.com/github/jsantiagoh/xmppmock) [![bitHound Overall Score](https://www.bithound.io/github/jsantiagoh/xmppmock/badges/score.svg)](https://www.bithound.io/github/jsantiagoh/xmppmock)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Build Status](https://travis-ci.org/ngti/xmppmock.svg?branch=master)](https://travis-ci.org/ngti/xmppmock) [![Code Climate](https://codeclimate.com/github/ngti/xmppmock/badges/gpa.svg)](https://codeclimate.com/github/ngti/xmppmock) [![bitHound Overall Score](https://www.bithound.io/github/ngti/xmppmock/badges/score.svg)](https://www.bithound.io/github/ngti/xmppmock)
 
 The purpose of this project is to provide an XMPP endpoint for integration tests of services that require a [XEP-0114](http://www.xmpp.org/extensions/xep-0114.html) connection.
 
@@ -34,7 +34,7 @@ services:
       - 80:80
 
   xmppmock:
-    image: jsantiagoh/xmppmock
+    image: your.local.docker.registry/xmppmock
     environment:
       - COMPONENT_PORT=11221
       - COMPONENT_PASS=pass11221
