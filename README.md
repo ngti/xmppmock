@@ -1,6 +1,6 @@
 XMPP Mock
 =========
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Build Status](https://travis-ci.org/jsantiagoh/xmppmock.svg?branch=master)](https://travis-ci.org/jsantiagoh/xmppmock) [![Code Climate](https://codeclimate.com/github/jsantiagoh/xmppmock/badges/gpa.svg)](https://codeclimate.com/github/jsantiagoh/xmppmock) [![bitHound Overall Score](https://www.bithound.io/github/jsantiagoh/xmppmock/badges/score.svg)](https://www.bithound.io/github/jsantiagoh/xmppmock)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Build Status](https://travis-ci.org/ngti/xmppmock.svg?branch=master)](https://travis-ci.org/ngti/xmppmock) [![Code Climate](https://codeclimate.com/github/ngti/xmppmock/badges/gpa.svg)](https://codeclimate.com/github/ngti/xmppmock) [![bitHound Overall Score](https://www.bithound.io/github/ngti/xmppmock/badges/score.svg)](https://www.bithound.io/github/ngti/xmppmock)
 
 The purpose of this project is to provide an XMPP endpoint for integration tests of services that require a [XEP-0114](http://www.xmpp.org/extensions/xep-0114.html) connection.
 
@@ -34,7 +34,7 @@ services:
       - 80:80
 
   xmppmock:
-    image: jsantiagoh/xmppmock
+    image: your.local.docker.registry/xmppmock
     environment:
       - COMPONENT_PORT=11221
       - COMPONENT_PASS=pass11221
@@ -46,7 +46,28 @@ services:
 
 In order to use SSL/TLS, instead of `SERVER_HOST` and `SERVER_PORT`, specify `SERVER_HOST_SSL` and `SERVER_PORT_SSL`
 and put the certificate and private key files in the `certs` subdirectory,
-named `certs/SERVER_HOST_SSL.key` and `certs/SERVER_HOST_SSL.key` 
+named `certs/SERVER_HOST_SSL.crt` and `certs/SERVER_HOST_SSL.key`
+
+These environment settings define which ports are bound to by the container (may be different than the host):
+
+| NAME | Default | Description |
+| ---- | ------: | ----------- |
+| COMPONENT_PORT | 6666 | XMPP component port |
+| COMPONENT_PASS | password | XMPP component password |
+| SERVER_HOST | localhost | XMPP domain |
+| SERVER_PORT | 5222 | XMPP client port |
+| SERVER_HOST_SSL | example.com | XMPP domain when using SSL/TLS |
+| SERVER_PORT_SSL | 443 | XMPP client port for SSL/TLS |
+| USE_SSL |  | `true` to use SSL. See instructions above for .crt and .key file locations |
+
+The provided Dockerfile exposes these container ports, your docker-compose file should match them:
+
+| TCP Port | What |
+| -------: | ---- |
+| 6666 | XMPP component |
+| 3000 | REST/HTTP API port |
+| 5222 | XMPP client port |
+| 443  | XMPP client port for SSL/TLS |
 
 
 Running xmppmock standalone
