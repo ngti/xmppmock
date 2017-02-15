@@ -219,6 +219,11 @@ app.post('/v1/start', (req, res) => {
   res.status(200).end()
 })
 
+app.post('/v1/status', (req, res) => {
+  xmppMock.getStatus()
+  res.status(200).end()
+})
+
 app.listen(3000, () => {
   console.log('XMPP Mock listening on port 3000!')
 })

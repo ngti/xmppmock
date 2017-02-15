@@ -61,7 +61,6 @@ function start (emitter) {
   xmppC2sServer.start()
   xmppComponentServer.start()
 
-
   xmppComponentServer.addStanzaHandler((stanza) => {
     addToDb(stanza, emitter)
   })
@@ -235,12 +234,14 @@ function flushReceived () {
 
 function killConnections () {
   xmppC2sServer.disconnect()
-  xmppComponentServer.disconnect()
 }
 
 function stop () {
   xmppC2sServer.stop()
-  xmppComponentServer.stop()
+}
+
+function getStatus () {
+  return xmppC2sServer.getStatus()
 }
 
 module.exports = {
@@ -260,5 +261,6 @@ module.exports = {
   flushReceived,
   receivedStanzaFromClient,
   killConnections,
-  stop
+  stop,
+  getStatus
 }

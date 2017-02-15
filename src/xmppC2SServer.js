@@ -108,4 +108,8 @@ XmppServer.prototype.stop = function () {
   this.server.end()
 }
 
+XmppServer.prototype.getStatus = function () {
+  return this.server.client.isConnected()
+}
+
 module.exports = XmppServer
