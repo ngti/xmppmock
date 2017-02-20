@@ -29,7 +29,7 @@ function matching (matcher, stanza) {
  *
  */
 function compareText (expectedValue, value, result) {
-  console.log(`Compare text '${expectedValue}', '${value}'`)
+  console.log(`Compare text expected: '${expectedValue}', value: '${value}'`)
 
   // Compare trivial equality (full text match)
   if (expectedValue === value) {
@@ -101,12 +101,19 @@ function compareAttributes (expectedAttrs, attrs, result) {
   return result
 }
 
-function getChild (children, name) {
+function getChild (children, name, expectedAttrs, result) {
   for (var i in children) {
-    if (children[ i ].name === name) {
-      return children[ i ]
+    let child = children[ i ]
+    if (child.name === name) {
+      result = compareAttributes(expectedAttrs, child.attrs, result)
+      if (result.matches) {
+        return { child: child, result: result }
+      }
+      result.matches = true
     }
   }
+  // not found
+  return { result: result }
 }
 
 function getText (child) {
@@ -128,7 +135,9 @@ function compareChildren (expected, children, result) {
     let matcher = expected[ i ]
 
     var name = matcher.name
-    var child = getChild(children, name)
+    var foundChild = getChild(children, name, matcher.attrs, result)
+    var child = foundChild.child
+    result = foundChild.result
 
     if (matcher.absent && !child) {
       // fine, go, on...
@@ -149,11 +158,6 @@ function compareChildren (expected, children, result) {
           console.log(`No match - Unexpected text ${textChild}`)
           return result
         }
-      }
-      result = compareAttributes(matcher.attrs, child.attrs, result)
-      if (!result.matches) {
-        // console.log("Attributes don't match")
-        return result
       }
       result = compareChildren(matcher.children, child.children, result)
     }
