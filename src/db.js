@@ -29,7 +29,6 @@ class Database {
     var data = this.coll.chain().find({ 'type': type }).simplesort('id', true).data()
     callback(null, data)
   }
-
 }
 
 module.exports = Database
