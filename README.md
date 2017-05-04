@@ -88,6 +88,16 @@ POSTing to /v1/disconnect will disconnect current sessions.
 POSTing to /v1/stop will disconnect current sessions and not accept any more attempts to connect.  
 POSTing to /v1/start will restart the server, allowing new connections.  
 
+Retrieve received stanzas
+===========
+All stanzas sent to the mock are recorded and can be retrieved using the following methods:
+- /v1/stanzas (all received stanzas)
+- /v1/iq
+- /v1/messages
+- /v1/presence
+
+To filter by IQ type call /v1/iq with a 'child' query parameter, i.e.: http://localhost:3000/v1/iq?child=test
+
 Mocking request/responses
 ===========
 To mock some actions to be taken when a matching stanza is sent, a POST can be issued to /v1/mock/when. The request

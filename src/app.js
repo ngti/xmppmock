@@ -70,19 +70,40 @@ app.get('/v1/messages', (req, res) => {
   }
 })
 
-app.get('/v1/iq', (req, res) => {
-  function findAndRespond () {
+app.get('/v1/iq/', (req, res) => {
+  function findAndRespond (childToFilter) {
     xmppMock.getReceived('iq', (err, docs) => {
       if (err) {
         res.status(500).send(err).end()
         return
       }
-      res.json(docs).end()
+
+      if (childToFilter) {
+        var filtered = []
+        for (var doc of docs) {
+          let stanza = doc.xml
+
+          console.log(stanza)
+          var xmlst = xml.parse(stanza)
+          console.log(xmlst)
+
+          let found = xmlst.children.find(function (child) { return child.name === childToFilter })
+          console.log('found: ' + found)
+
+          if (found) {
+            filtered.push(doc)
+          }
+        }
+        res.json(filtered).end()
+      } else {
+        res.json(docs).end()
+      }
     })
   }
 
   if (xmppMock.isDirty()) {
-    findAndRespond()
+    var child = req.query.child
+    findAndRespond(child)
   } else {
     ewait.waitForAll([ emitter ], (err) => {
       if (err) {
