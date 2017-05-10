@@ -238,6 +238,7 @@ function killConnections () {
 
 function stop () {
   xmppC2sServer.stop()
+  xmppComponentServer.stop()
 }
 
 function getStatus () {
