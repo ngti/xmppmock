@@ -22,7 +22,7 @@ The purpose of this project is to provide an XMPP endpoint for integration tests
   - [Placeholders](#placeholders)
   - [Setting actions](#setting-actions)
 - [Examples](#examples)
-  - [Send a message back to the user, replacing 'from' and body from the original message](#send-a-message-back-to-the-user-replacing-from-and-body-from-the-original-message)
+  - [Respond with the 'from' and 'body' from the received message](#respond-with-the-from-and-body-from-the-received-message)
   - [Send sent and received receipts for all messages](#send-sent-and-received-receipts-for-all-messages)
   - [Match IQ by 'to', child attribute, send result](#match-iq-by-to-child-attribute-send-result)
 
