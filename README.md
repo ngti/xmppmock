@@ -96,7 +96,11 @@ All stanzas sent to the mock are recorded and can be retrieved using the followi
 - /v1/messages
 - /v1/presence
 
-To filter by IQ type call /v1/iq with a 'child' query parameter, i.e.: http://localhost:3000/v1/iq?child=test
+To filter by IQ type call /v1/iq with a 'child' query parameter, i.e.: 
+`http://localhost:3000/v1/iq?child=test`
+
+If filtering by xml namespace is required, just add a 'xmlns' parameter, i.e.:
+`http://localhost:3000/v1/iq?child=test&xmlns=ucid:history#timeline`
 
 Mocking request/responses
 ===========

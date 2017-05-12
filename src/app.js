@@ -71,7 +71,7 @@ app.get('/v1/messages', (req, res) => {
 })
 
 app.get('/v1/iq/', (req, res) => {
-  function findAndRespond (childToFilter) {
+  function findAndRespond (childToFilter, childXmlns) {
     xmppMock.getReceived('iq', (err, docs) => {
       if (err) {
         res.status(500).send(err).end()
@@ -87,7 +87,10 @@ app.get('/v1/iq/', (req, res) => {
           var xmlst = xml.parse(stanza)
           console.log(xmlst)
 
-          let found = xmlst.children.find(function (child) { return child.name === childToFilter })
+          let found = xmlst.children.find(function (child) {
+              return (!childXmlns || child.attrs[ 'xmlns' ] === childXmlns) && child.name === childToFilter
+            }
+          )
           console.log('found: ' + found)
 
           if (found) {
@@ -103,7 +106,8 @@ app.get('/v1/iq/', (req, res) => {
 
   if (xmppMock.isDirty()) {
     var child = req.query.child
-    findAndRespond(child)
+    var childXmlns = req.query.xmlns
+    findAndRespond(child, childXmlns)
   } else {
     ewait.waitForAll([ emitter ], (err) => {
       if (err) {
