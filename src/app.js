@@ -193,12 +193,17 @@ app.post('/v1/mock/when/equals', (req, res) => {
 app.post('/v1/mock/when', (req, res) => {
   if (!req.body.matches || !req.body.actions) {
     res.status(400).end()
-    console.log("bad request, doesn't contain matches and actions")
+    console.log("Invalid request, doesn't contain matches and actions")
     return
   }
-  var matches = JSON.parse(req.body.matches)
-  var actions = JSON.parse(req.body.actions)
+  let matches = JSON.parse(req.body.matches)
+  if (matches.times && matches.times !== 'inf' && !isNumber(matches.times)) {
+    res.status(400).end()
+    console.log("Invalid request, 'times' can only be a number of the string 'inf'")
+    return
+  }
 
+  let actions = JSON.parse(req.body.actions)
   if (Object.prototype.toString.call(actions) !== '[object Array]') {
     res.status(400).send("'actions' is expected to be an array!").end()
     return
@@ -206,11 +211,19 @@ app.post('/v1/mock/when', (req, res) => {
 
   console.log(`Mocking xmpp stanza(ignoring stanza id):\n${JSON.stringify(matches)}\nresult will be:\n${JSON.stringify(actions)}\n`)
 
+  // Set default matching times
+  if (!matches.times) {
+    matches.times = 1
+  }
+  console.log(`This match will happen ${matches.times} times`)
   xmppMock.addExpectationV2(matches, actions)
 
   res.status(200).end()
 })
 
+function isNumber (n) {
+  return !isNaN(parseFloat(n)) && isFinite(n)
+}
 /*
  Clear all expectations
  */

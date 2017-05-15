@@ -145,7 +145,10 @@ should issue `application/x-www-form-urlencoded` as its Content-Type. This call 
 The `matches` form field should contain a JSON object.
 
 Here, the `name` will match an XML tag name, `attrs` indicate values for the tag attributes, and `children` indicates the
-presence of children elements. Each child tag is matched by the same rules, and they can be nested in principle indefinitely.
+presence of children elements. Each child tag is matched by the same rules, and they can be nested.
+By default each rule will match once and then be removed. To increase the number of times you want the
+rule to match, use the 'times' field, indicating either the number of times to match or the string 'inf', if you
+want it to match indefinitely.
 
 ```json
 {
@@ -174,7 +177,8 @@ presence of children elements. Each child tag is matched by the same rules, and 
       "name": "body",
       "text": "Hello, %%NAME%%"
     }
-  ]
+  ],
+  "times": 2
 }
 ```
 

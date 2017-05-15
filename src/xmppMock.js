@@ -162,22 +162,23 @@ function matchExpectationsV1 (stanza) {
 }
 
 function matchExpectationsV2 (stanza) {
-  for (var i = 0; i < expectationsv2.length; i++) {
-    var matcher = expectationsv2[ i ].matches
+  for (let i = 0; i < expectationsv2.length; i++) {
+    let expectation = expectationsv2[ i ]
+    let matcher = expectation.matches
 
-    var match = stanzaMatcher.matching(matcher, stanza)
+    let match = stanzaMatcher.matching(matcher, stanza)
     if (match.matches) {
       console.log(`Match found, replacements: ${JSON.stringify(match.replacements)}`)
 
-      var actions = expectationsv2[ i ].actions
+      let actions = expectation.actions
 
-      for (var action of actions) {
-        for (var curActionType in action) {
+      for (let action of actions) {
+        for (let curActionType in action) {
           if (action.hasOwnProperty(curActionType)) {
             console.log(`Performing action: ${curActionType}`)
 
             if (curActionType === 'sendResults') {
-              for (var r of action.sendResults) {
+              for (let r of action.sendResults) {
                 if (r === 'mdnSent') {
                   sendStanzas([ stanzaBuilder.buildMdnSent(stanza) ], match.replacements)
                 } else if (r === 'mdnReceived') {
@@ -192,6 +193,15 @@ function matchExpectationsV2 (stanza) {
               console.log(`Unknown result set ${curActionType}`)
             }
           }
+        }
+      }
+      if (matcher.times !== 'inf') {
+        if (matcher.times === 1) {
+          console.log('Removing expectation')
+          expectationsv2.splice(i, 1)
+        } else {
+          console.log('Decreasing expectation times')
+          matcher.times -= 1
         }
       }
     }
