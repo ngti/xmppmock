@@ -68,9 +68,7 @@ services:
       - 3000:3000
 ```
 
-In order to use SSL/TLS, instead of `SERVER_HOST` and `SERVER_PORT`, specify `SERVER_HOST_SSL` and `SERVER_PORT_SSL`
-and put the certificate and private key files in the `certs` subdirectory,
-named `certs/SERVER_HOST_SSL.crt` and `certs/SERVER_HOST_SSL.key`
+In order to use SSL/TLS, instead of `SERVER_HOST` and `SERVER_PORT`, specify `SERVER_HOST_SSL` and `SERVER_PORT_SSL` and put the certificate and private key files in the `certs` subdirectory, named `certs/SERVER_HOST_SSL.crt` and `certs/SERVER_HOST_SSL.key`
 
 These environment settings define which ports are bound to by the container (may be different than the host):
 
@@ -124,18 +122,13 @@ All stanzas sent to the mock are recorded and can be retrieved using the followi
 - `GET /v1/messages`
 - `GET /v1/presence`
 
-To filter by IQ type call /v1/iq with a 'child' query parameter, i.e.: 
-`http://localhost:3000/v1/iq?child=test`
+To filter by IQ type call /v1/iq with a 'child' query parameter, i.e.: `/v1/iq?child=test`
 
-If filtering by xml namespace is required, just add a 'xmlns' parameter, i.e.:
-`http://localhost:3000/v1/iq?child=test&xmlns=ucid:history#timeline`
-
-To filter by IQ type call /v1/iq with a 'child' query parameter, i.e.: `GET /v1/iq?child=test`
+If filtering by xml namespace is required, just add a 'xmlns' parameter, i.e.: `/v1/iq?child=test&xmlns=ucid:history#timeline`
 
 ## Mocking request/responses
 
-To mock some actions to be taken when a matching stanza is sent, a `POST` can be issued to `/v1/mock/when`. The request
-should issue `application/x-www-form-urlencoded` as its Content-Type. This call takes two form fields:
+To mock some actions to be taken when a matching stanza is sent, a `POST` can be issued to `/v1/mock/when`. The request should issue `application/x-www-form-urlencoded` as its Content-Type. This call takes two form fields:
 
 - `matches` indicates properties the stanza should match.
 - `actions` indicates the actions to take when a stanza is matched.
@@ -144,11 +137,9 @@ should issue `application/x-www-form-urlencoded` as its Content-Type. This call 
 
 The `matches` form field should contain a JSON object.
 
-Here, the `name` will match an XML tag name, `attrs` indicate values for the tag attributes, and `children` indicates the
-presence of children elements. Each child tag is matched by the same rules, and they can be nested.
-By default each rule will match once and then be removed. To increase the number of times you want the
-rule to match, use the 'times' field, indicating either the number of times to match or the string 'inf', if you
-want it to match indefinitely.
+Here, the `name` will match an XML tag name, `attrs` indicate values for the tag attributes, and `children` indicates the presence of children elements. Each child tag is matched by the same rules, and they can be nested. By default each rule will matched once and then be removed.
+
+By default an expectation is matched only once. To increase the number of times you want the rule to match, use the `times` field. It is used to indicate how many times the stanza is expected to match. If the stanza should be matched until reset use the string "inf".
 
 ```json
 {
@@ -187,7 +178,7 @@ This will match the following stanza:
 ```xml
 <iq from="user1@domain.com/123" to="user2@example.com" id="id_123" type="result" ts="2017-05-11T11:13:55.335Z">
   <add xmlns="ucid:groupchat" />
-  <body>"Hello, World"</body>
+  <body>Hello, World</body>
 </iq>
 ```
 
@@ -203,8 +194,7 @@ Placeholders are matched by the `%%\w+%%` regexp, which means `a-z A-Z 0-9` and 
 
 ### Setting actions
 
-When a stanza is matched, several actions can be set. The 'actions' form field should contain
-a JSON array with these supported actions:
+When a stanza is matched, several actions can be set. The 'actions' form field should contain a JSON array with these supported actions:
 
 ```json
 [
